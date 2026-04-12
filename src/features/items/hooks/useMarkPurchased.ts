@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { markPurchased } from '../api/itemsApi'
 import { QUERY_KEYS } from '@/lib/queryKeys'
-import { normalizeError, type ApiError } from '@/services/api'
+import type { ApiError } from '@/services/api'
 import type { ItemDto } from '../types'
 
 interface Variables {
