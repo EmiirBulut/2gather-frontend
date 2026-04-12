@@ -40,21 +40,6 @@ const ListCard = ({ list, onDelete, canDelete }: Props) => {
         )}
       </div>
 
-      <div className={styles.stats}>
-        <div className={styles.stat}>
-          <span className={styles.statValue}>{list.itemCount}</span>
-          <span className={styles.statLabel}>Toplam</span>
-        </div>
-        <div className={styles.stat}>
-          <span className={styles.statValue}>{list.pendingCount}</span>
-          <span className={styles.statLabel}>Bekleyen</span>
-        </div>
-        <div className={styles.stat}>
-          <span className={styles.statValue}>{list.itemCount - list.pendingCount}</span>
-          <span className={styles.statLabel}>Tamamlanan</span>
-        </div>
-      </div>
-
       <div className={styles.footer}>
         <div className={styles.memberCount}>
           <div className={styles.memberDots}>
@@ -64,13 +49,6 @@ const ListCard = ({ list, onDelete, canDelete }: Props) => {
           </div>
           <span>{list.memberCount} üye</span>
         </div>
-
-        {list.pendingCount > 0 && (
-          <span className={styles.pendingChip}>
-            <span className={styles.pendingDot} />
-            {list.pendingCount} bekliyor
-          </span>
-        )}
       </div>
     </div>
   )

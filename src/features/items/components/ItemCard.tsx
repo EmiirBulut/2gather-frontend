@@ -14,8 +14,6 @@ const ItemCard = ({ item, onClick }: Props) => {
     .join('')
     .toUpperCase()
 
-  const hasPrice = item.selectedOptionSummary?.price != null
-
   return (
     <div
       className={`${styles.card} ${item.status === 'Purchased' ? styles.isPurchased : ''}`}
@@ -30,27 +28,17 @@ const ItemCard = ({ item, onClick }: Props) => {
       {/* Info */}
       <div className={styles.info}>
         <span className={styles.name}>{item.name}</span>
-        {item.selectedOptionSummary ? (
-          <span className={styles.optionSummary}>
-            {item.selectedOptionSummary.title}
-          </span>
-        ) : (
-          <span className={styles.optionsCount}>
-            {item.optionsCount > 0
-              ? `${item.optionsCount} seçenek`
-              : 'Seçenek yok'}
-          </span>
-        )}
+        <span className={styles.optionsCount}>
+          {item.optionsCount > 0
+            ? `${item.optionsCount} seçenek`
+            : 'Seçenek yok'}
+        </span>
       </div>
 
       {/* Right side */}
-      {item.status === 'Purchased' ? (
+      {item.status === 'Purchased' && (
         <span className={styles.purchasedBadge}>✓ Alındı</span>
-      ) : hasPrice ? (
-        <span className={styles.price}>
-          ${item.selectedOptionSummary!.price!.toLocaleString()}
-        </span>
-      ) : null}
+      )}
     </div>
   )
 }
