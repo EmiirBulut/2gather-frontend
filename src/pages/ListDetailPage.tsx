@@ -4,6 +4,7 @@ import { useItems } from '@/features/items/hooks/useItems'
 import StatusFilter from '@/features/items/components/StatusFilter'
 import ItemListGroup from '@/features/items/components/ItemListGroup'
 import AddItemModal from '@/features/items/components/AddItemModal'
+import ItemDetailModal from '@/features/options/components/ItemDetailModal'
 import { useListStore } from '@/store/listStore'
 import { ROUTES } from '@/router/routes'
 import type { ItemDto, StatusFilter as StatusFilterType } from '@/features/items/types'
@@ -201,9 +202,12 @@ const ListDetailPage = () => {
         <AddItemModal listId={listId} onClose={() => setIsAddModalOpen(false)} />
       )}
 
-      {/* Phase 5: ItemDetailModal for selectedItem */}
       {selectedItem && (
-        <div style={{ display: 'none' }} aria-hidden="true" />
+        <ItemDetailModal
+          item={selectedItem}
+          listId={listId}
+          onClose={() => setSelectedItem(null)}
+        />
       )}
     </div>
   )
