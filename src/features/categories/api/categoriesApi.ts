@@ -2,7 +2,9 @@ import { apiClient } from '@/services/api'
 import type { CategoryDto, CreateCategoryRequest } from '../types'
 
 export async function getCategories(listId: string): Promise<CategoryDto[]> {
-  const response = await apiClient.get<CategoryDto[]>(`/api/lists/${listId}/categories`)
+  const response = await apiClient.get<CategoryDto[]>('/api/categories', {
+    params: { listId },
+  })
   return response.data
 }
 

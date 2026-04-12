@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useItems } from '@/features/items/hooks/useItems'
+import { useListDetail } from '@/features/lists/hooks/useListDetail'
 import StatusFilter from '@/features/items/components/StatusFilter'
 import ItemListGroup from '@/features/items/components/ItemListGroup'
 import AddItemModal from '@/features/items/components/AddItemModal'
@@ -23,6 +24,9 @@ const ListDetailPage = () => {
 
   // Set active list in global store
   if (listId) setActiveListId(listId)
+
+  // Populate list detail cache (members embedded) for usePermission
+  useListDetail(listId ?? '')
 
   // Real-time updates via SignalR
   useSignalR()
