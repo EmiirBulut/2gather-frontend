@@ -1,0 +1,162 @@
+/* Auth sayfaları için iki kolonlu layout:
+   Sol: editorial hero panel (primary gradient)
+   Sağ: form paneli (surface) */
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100dvh;
+}
+
+/* ── Sol panel — hero ── */
+.hero {
+  background: linear-gradient(160deg, var(--color-primary) 0%, var(--color-primary-container) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--space-12) var(--space-10);
+  position: relative;
+  overflow: hidden;
+}
+
+.heroPattern {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 80%, rgba(255,255,255,0.04) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.06) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.heroTop {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.logoMark {
+  width: 36px;
+  height: 36px;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: var(--text-title-md);
+  font-weight: 700;
+  color: var(--color-on-primary);
+}
+
+.logoName {
+  font-family: var(--font-display);
+  font-size: var(--text-title-md);
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+  letter-spacing: -0.01em;
+}
+
+.heroHeadline {
+  font-family: var(--font-display);
+  font-size: var(--text-display-md);
+  font-weight: 800;
+  color: var(--color-on-primary);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.heroSubline {
+  font-family: var(--font-body);
+  font-size: var(--text-body-md);
+  color: rgba(255,255,255,0.65);
+  margin-top: var(--space-4);
+  max-width: 320px;
+  line-height: 1.6;
+}
+
+.heroBottom {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.featureTag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background-color: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.8);
+  font-family: var(--font-body);
+  font-size: var(--text-label-md);
+  font-weight: 500;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-full);
+  width: fit-content;
+}
+
+.featureDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--color-primary-fixed);
+}
+
+/* ── Sağ panel — form ── */
+.formPanel {
+  background-color: var(--color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12) var(--space-10);
+}
+
+.formInner {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.formHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.formTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-headline-lg);
+  font-weight: 800;
+  color: var(--color-on-surface);
+  letter-spacing: -0.02em;
+}
+
+.formSubtitle {
+  font-family: var(--font-body);
+  font-size: var(--text-body-md);
+  color: var(--color-on-surface-variant);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    display: none;
+  }
+
+  .formPanel {
+    padding: var(--space-8) var(--space-6);
+    align-items: flex-start;
+    padding-top: var(--space-12);
+  }
+}
