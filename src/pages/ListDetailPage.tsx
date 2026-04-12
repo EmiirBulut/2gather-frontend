@@ -6,6 +6,7 @@ import ItemListGroup from '@/features/items/components/ItemListGroup'
 import AddItemModal from '@/features/items/components/AddItemModal'
 import ItemDetailModal from '@/features/options/components/ItemDetailModal'
 import { useListStore } from '@/store/listStore'
+import { useSignalR } from '@/hooks/useSignalR'
 import { ROUTES } from '@/router/routes'
 import type { ItemDto, StatusFilter as StatusFilterType } from '@/features/items/types'
 import styles from './ListDetailPage.module.css'
@@ -21,6 +22,9 @@ const ListDetailPage = () => {
 
   // Set active list in global store
   if (listId) setActiveListId(listId)
+
+  // Real-time updates via SignalR
+  useSignalR()
 
   const { data: items, isLoading, isError } = useItems(listId ?? '', statusFilter)
 
