@@ -1,0 +1,163 @@
+/* Dashboard Home görselindeki kart estetiği:
+   surface-container-lowest card, ambient shadow, tonal lift */
+
+.card {
+  background-color: var(--color-surface-container-lowest);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-6);
+  cursor: pointer;
+  transition: box-shadow var(--transition-base), transform var(--transition-base);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-ambient);
+  transform: translateY(-2px);
+}
+
+/* subtle tonal accent strip on top */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-primary-container) 100%);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.name {
+  font-family: var(--font-display);
+  font-size: var(--text-title-lg);
+  font-weight: 700;
+  color: var(--color-on-surface);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.deleteBtn {
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  color: var(--color-on-surface-variant);
+  background: none;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.card:hover .deleteBtn {
+  opacity: 1;
+}
+
+.deleteBtn:hover {
+  color: var(--color-danger);
+  background-color: color-mix(in srgb, var(--color-danger) 8%, transparent);
+}
+
+/* ── Stats ── */
+.stats {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.statValue {
+  font-family: var(--font-display);
+  font-size: var(--text-headline-sm);
+  font-weight: 700;
+  color: var(--color-on-surface);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.statLabel {
+  font-family: var(--font-body);
+  font-size: var(--text-label-sm);
+  font-weight: 500;
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Footer ── */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.memberCount {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface-variant);
+}
+
+.memberDots {
+  display: flex;
+  gap: -4px;
+}
+
+.memberDot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-container) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-on-primary);
+  border: 2px solid var(--color-surface-container-lowest);
+}
+
+.pendingChip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  background-color: color-mix(in srgb, var(--color-pending) 12%, transparent);
+  color: var(--color-pending);
+  font-family: var(--font-body);
+  font-size: var(--text-label-sm);
+  font-weight: 600;
+  padding: 3px var(--space-2);
+  border-radius: var(--radius-full);
+}
+
+.pendingDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: currentColor;
+}
