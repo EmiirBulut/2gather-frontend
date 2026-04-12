@@ -1,0 +1,40 @@
+/* Living Room Items görselindeki section başlıkları:
+   "Essentials (Must Have)", "Planning (Should Have)" gibi */
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.groupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: var(--space-2);
+}
+
+.groupTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-title-md);
+  font-weight: 700;
+  color: var(--color-on-surface);
+  letter-spacing: -0.01em;
+}
+
+.groupCount {
+  font-family: var(--font-body);
+  font-size: var(--text-label-md);
+  font-weight: 500;
+  color: var(--color-on-surface-variant);
+  background-color: var(--color-surface-container-highest);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  /* DESIGN.md §5: no dividers, vertical whitespace separates items */
+  gap: var(--space-3);
+}
