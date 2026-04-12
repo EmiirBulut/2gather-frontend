@@ -7,6 +7,7 @@ import AddItemModal from '@/features/items/components/AddItemModal'
 import ItemDetailModal from '@/features/options/components/ItemDetailModal'
 import { useListStore } from '@/store/listStore'
 import { useSignalR } from '@/hooks/useSignalR'
+import OnlinePresence from '@/features/members/components/OnlinePresence'
 import { ROUTES } from '@/router/routes'
 import type { ItemDto, StatusFilter as StatusFilterType } from '@/features/items/types'
 import styles from './ListDetailPage.module.css'
@@ -75,6 +76,7 @@ const ListDetailPage = () => {
           <div className={styles.navLogoMark}>2G</div>
         </div>
         <div className={styles.navRight}>
+          <OnlinePresence listId={listId} />
           <button
             className={styles.backBtn}
             onClick={() => navigate(ROUTES.MEMBERS_WITH_ID(listId))}

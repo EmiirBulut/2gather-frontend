@@ -1,0 +1,72 @@
+/* Online presence indicator — avatar row in list detail navbar */
+
+.presence {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Live green pulse dot */
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-purchased);
+  flex-shrink: 0;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.45; }
+}
+
+/* Stacked avatars */
+.avatars {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary);
+  color: var(--color-surface);
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  /* Overlap each avatar onto the previous */
+  margin-left: -6px;
+  /* Ghost border using outline_variant at low opacity — DESIGN.md fallback */
+  box-shadow: 0 0 0 2px rgba(195, 200, 193, 0.4);
+  transition: transform var(--transition-fast);
+}
+
+.avatar:first-child {
+  margin-left: 0;
+}
+
+.avatar:hover {
+  transform: translateY(-2px);
+  z-index: 1;
+}
+
+.overflow {
+  background-color: var(--color-surface-container-highest);
+  color: var(--color-on-surface-variant);
+}
+
+/* Label */
+.label {
+  font-family: var(--font-body);
+  font-size: var(--text-label-sm);
+  font-weight: 500;
+  color: var(--color-on-surface-variant);
+  white-space: nowrap;
+}
