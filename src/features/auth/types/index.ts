@@ -11,6 +11,16 @@ export interface LoginRequest {
   password: string
 }
 
+// Shape returned by the backend (flat)
+export interface BackendAuthResponse {
+  accessToken: string
+  refreshToken: string
+  userId: string
+  email: string
+  displayName: string
+}
+
+// Normalized shape used internally
 export interface AuthResponse {
   accessToken: string
   refreshToken: string

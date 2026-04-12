@@ -3,9 +3,8 @@
 export interface ListSummaryDto {
   id: string
   name: string
+  ownerId: string
   memberCount: number
-  itemCount: number
-  pendingCount: number
   createdAt: string
 }
 
