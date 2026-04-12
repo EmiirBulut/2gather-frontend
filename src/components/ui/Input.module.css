@@ -1,0 +1,59 @@
+/* DESIGN.md §5: "Forbid the box look.
+   surface-container-low bg + 2px bottom stroke in outline_variant → primary on focus" */
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.label {
+  font-family: var(--font-body);
+  font-size: var(--text-label-md);
+  font-weight: 500;
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.inputWrapper {
+  position: relative;
+}
+
+.input {
+  width: 100%;
+  background-color: var(--color-surface-container-low);
+  border: none;
+  border-bottom: 2px solid var(--color-outline-variant);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-body);
+  font-size: var(--text-body-md);
+  color: var(--color-on-surface);
+  outline: none;
+  transition: border-color var(--transition-base), background-color var(--transition-base);
+}
+
+.input::placeholder {
+  color: var(--color-outline-variant);
+}
+
+.input:focus {
+  border-bottom-color: var(--color-primary);
+  background-color: var(--color-surface-container);
+}
+
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hasError .input {
+  border-bottom-color: var(--color-danger);
+}
+
+.errorMessage {
+  font-family: var(--font-body);
+  font-size: var(--text-label-md);
+  color: var(--color-danger);
+}

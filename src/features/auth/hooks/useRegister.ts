@@ -1,0 +1,26 @@
+import { useMutation } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
+import { register } from '../api/authApi'
+import { useAuthStore } from '@/store/authStore'
+import { normalizeError, type ApiError } from '@/services/api'
+import { ROUTES } from '@/router/routes'
+import type { RegisterRequest } from '../types'
+
+export function useRegister() {
+  const navigate = useNavigate()
+  const setAuth = useAuthStore((s) => s.setAuth)
+
+  return useMutation<void, ApiError, RegisterRequest>({
+    mutationFn: async (data: RegisterRequest) => {
+      const response = await register(data)
+      setAuth(response.accessToken, response.user)
+      sessionStorage.setItem('refresh-token', response.refreshToken)
+    },
+    onSuccess: () => {
+      navigate(ROUTES.LISTS)
+    },
+    onError: (error: unknown) => {
+      return normalizeError(error)
+    },
+  })
+}
