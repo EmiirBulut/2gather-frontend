@@ -1,27 +1,27 @@
 import { apiClient } from '@/services/api'
-import type { InviteRequest, MemberDto } from '../types'
+import type { InviteRequest } from '../types'
 
-export async function getMembers(listId: string): Promise<MemberDto[]> {
-  const response = await apiClient.get<MemberDto[]>(`/api/lists/${listId}/members`)
-  return response.data
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+export interface InviteResponse {
+  inviteId: string
+  invitedEmail: string
+  token: string
+  expiresAt: string
 }
 
-export async function inviteMember(listId: string, data: InviteRequest): Promise<void> {
-  await apiClient.post(`/api/lists/${listId}/members/invite`, data)
-}
+// ─── Members API Functions ────────────────────────────────────────────────────
 
-export async function removeMember(listId: string, userId: string): Promise<void> {
-  await apiClient.delete(`/api/lists/${listId}/members/${userId}`)
-}
+// Members are embedded in GET /api/lists/:id — see useListDetail.
+// Only invite is available as a write operation on the current backend.
 
-export async function updateMemberRole(
+export async function inviteMember(
   listId: string,
-  userId: string,
-  role: 'Editor' | 'Viewer'
-): Promise<MemberDto> {
-  const response = await apiClient.patch<MemberDto>(
-    `/api/lists/${listId}/members/${userId}/role`,
-    { role }
+  data: InviteRequest
+): Promise<InviteResponse> {
+  const response = await apiClient.post<InviteResponse>(
+    `/api/lists/${listId}/members/invite`,
+    data
   )
   return response.data
 }
