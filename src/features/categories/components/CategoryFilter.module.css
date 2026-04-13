@@ -1,0 +1,42 @@
+/* Horizontal scrollable chip row — DESIGN.md: full roundedness, primary_fixed active */
+
+.filterBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.filterBar::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding: 6px var(--space-4);
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: var(--text-label-sm);
+  font-weight: 500;
+  background-color: var(--color-surface-container-low);
+  color: var(--color-on-surface-variant);
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.chip:hover {
+  background-color: var(--color-surface-container-highest);
+  color: var(--color-on-surface);
+}
+
+.chip.active {
+  background-color: color-mix(in srgb, var(--color-primary) 15%, transparent);
+  color: var(--color-primary);
+  font-weight: 600;
+}
