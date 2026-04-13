@@ -1,0 +1,102 @@
+.tableWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.tableHeader {
+  display: grid;
+  grid-template-columns: 1fr 60px 60px 72px 120px;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4) var(--space-3);
+  font-family: var(--font-body);
+  font-size: var(--text-label-sm);
+  font-weight: 600;
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.tableRow {
+  display: grid;
+  grid-template-columns: 1fr 60px 60px 72px 120px;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition-fast);
+}
+
+.tableRow:hover {
+  background-color: var(--color-surface-container-low);
+}
+
+.colCategory {
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  font-weight: 500;
+  color: var(--color-on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.colNum {
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  font-weight: 500;
+  color: var(--color-on-surface-variant);
+  text-align: center;
+}
+
+.purchased { color: var(--color-purchased); }
+.pending   { color: var(--color-pending); }
+
+/* Progress bar in last column */
+.colBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.barTrack {
+  flex: 1;
+  height: 5px;
+  background-color: var(--color-surface-container-highest);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  background-color: var(--color-primary);
+  border-radius: var(--radius-full);
+  transition: width 500ms ease;
+}
+
+.barPct {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-on-surface-variant);
+  width: 28px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.empty {
+  background-color: var(--color-surface-container-low);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface-variant);
+}
+
+@media (max-width: 520px) {
+  .tableHeader,
+  .tableRow {
+    grid-template-columns: 1fr 48px 48px 56px 80px;
+    gap: var(--space-2);
+  }
+}
