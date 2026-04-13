@@ -25,3 +25,7 @@ export interface InviteRequest {
   email: string
   role: 'Editor' | 'Viewer'
 }
+
+export interface UpdateMemberRoleRequest {
+  role: 'Editor' | 'Viewer'
+}
