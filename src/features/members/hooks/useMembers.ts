@@ -1,11 +1,3 @@
-import { useQuery } from '@tanstack/react-query'
-import { getMembers } from '../api/membersApi'
-import { QUERY_KEYS } from '@/lib/queryKeys'
-
-export function useMembers(listId: string) {
-  return useQuery({
-    queryKey: QUERY_KEYS.MEMBERS(listId),
-    queryFn: () => getMembers(listId),
-    enabled: Boolean(listId),
-  })
-}
+// Members are embedded in the list detail response (GET /api/lists/:id).
+// Use useListDetail instead — it populates LIST_DETAIL cache which usePermission reads.
+export { useListDetail as useMembers } from '@/features/lists/hooks/useListDetail'
