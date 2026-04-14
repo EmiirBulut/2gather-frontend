@@ -2,10 +2,13 @@ import { useState, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useItems } from '@/features/items/hooks/useItems'
 import { useListDetail } from '@/features/lists/hooks/useListDetail'
+import { usePermission } from '@/hooks/usePermission'
 import StatusFilter from '@/features/items/components/StatusFilter'
 import ItemListGroup from '@/features/items/components/ItemListGroup'
 import AddItemModal from '@/features/items/components/AddItemModal'
 import ItemDetailModal from '@/features/options/components/ItemDetailModal'
+import CategoryFilter from '@/features/categories/components/CategoryFilter'
+import AddCategoryModal from '@/features/categories/components/AddCategoryModal'
 import { useListStore } from '@/store/listStore'
 import { useSignalR } from '@/hooks/useSignalR'
 import OnlinePresence from '@/features/members/components/OnlinePresence'
@@ -19,7 +22,9 @@ const ListDetailPage = () => {
   const setActiveListId = useListStore((s) => s.setActiveListId)
 
   const [statusFilter, setStatusFilter] = useState<StatusFilterType>('Pending')
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<ItemDto | null>(null)
 
   // Set active list in global store
@@ -28,23 +33,28 @@ const ListDetailPage = () => {
   // Populate list detail cache (members embedded) for usePermission
   useListDetail(listId ?? '')
 
+  const { canEdit } = usePermission(listId ?? '')
+
   // Real-time updates via SignalR
   useSignalR()
 
   const { data: items, isLoading, isError } = useItems(listId ?? '', statusFilter)
 
-  // Group items by category
+  // Group items by category, applying category filter if set
   const groupedItems = useMemo(() => {
     if (!items) return []
+    const filtered = selectedCategoryId
+      ? items.filter((i) => i.categoryId === selectedCategoryId)
+      : items
     const map = new Map<string, { categoryName: string; items: ItemDto[] }>()
-    for (const item of items) {
+    for (const item of filtered) {
       if (!map.has(item.categoryId)) {
         map.set(item.categoryId, { categoryName: item.categoryName, items: [] })
       }
       map.get(item.categoryId)!.items.push(item)
     }
     return Array.from(map.values())
-  }, [items])
+  }, [items, selectedCategoryId])
 
   // Stats for completion bar
   const totalCount = items?.length ?? 0
@@ -138,7 +148,7 @@ const ListDetailPage = () => {
 
       {/* Main content */}
       <main className={styles.main}>
-        {/* Status filter */}
+        {/* Filters */}
         <div className={styles.filterBar}>
           <StatusFilter
             value={statusFilter}
@@ -146,6 +156,24 @@ const ListDetailPage = () => {
             pendingCount={statusFilter === 'All' ? items?.filter((i) => i.status === 'Pending').length : undefined}
             purchasedCount={statusFilter === 'All' ? purchasedCount : undefined}
           />
+          <div className={styles.categoryFilterRow}>
+            <CategoryFilter
+              listId={listId}
+              selectedCategoryId={selectedCategoryId}
+              onChange={setSelectedCategoryId}
+            />
+            {canEdit && (
+              <button
+                className={styles.addCategoryBtn}
+                onClick={() => setIsAddCategoryOpen(true)}
+                aria-label="Kategori ekle"
+              >
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                  <path d="M6.5 1v11M1 6.5h11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Item groups */}
@@ -217,6 +245,13 @@ const ListDetailPage = () => {
           item={selectedItem}
           listId={listId}
           onClose={() => setSelectedItem(null)}
+        />
+      )}
+
+      {isAddCategoryOpen && (
+        <AddCategoryModal
+          listId={listId}
+          onClose={() => setIsAddCategoryOpen(false)}
         />
       )}
     </div>
