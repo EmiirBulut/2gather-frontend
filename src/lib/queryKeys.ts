@@ -24,4 +24,7 @@ export const QUERY_KEYS = {
 
   // Ratings
   RATINGS: (optionId: string) => ['ratings', optionId] as const,
+
+  // Claims
+  CLAIMS: (optionId: string) => ['claims', optionId] as const,
 } as const

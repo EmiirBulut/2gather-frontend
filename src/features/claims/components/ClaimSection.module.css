@@ -1,0 +1,118 @@
+.section {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sectionTitle {
+  font-family: var(--font-body);
+  font-size: var(--text-label-sm);
+  font-weight: 600;
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.claimBtn {
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  font-weight: 500;
+  color: var(--color-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast);
+}
+
+.claimBtn:hover {
+  background-color: color-mix(in srgb, var(--color-primary) 8%, transparent);
+}
+
+/* ── Progress ── */
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.progressTrack {
+  flex: 1;
+  height: 6px;
+  background-color: var(--color-surface-container);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: var(--color-purchased);
+  border-radius: 999px;
+  transition: width var(--transition-base);
+}
+
+.progressLabel {
+  font-family: var(--font-body);
+  font-size: var(--text-label-sm);
+  color: var(--color-on-surface-variant);
+  white-space: nowrap;
+}
+
+/* ── Claims list ── */
+.claimList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.claimRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.claimName {
+  flex: 1;
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  color: var(--color-on-surface);
+}
+
+.claimPct {
+  font-family: var(--font-body);
+  font-size: var(--text-body-sm);
+  font-weight: 600;
+  color: var(--color-on-surface);
+}
+
+.statusBadge {
+  font-family: var(--font-body);
+  font-size: var(--text-label-sm);
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  padding: 2px var(--space-2);
+}
+
+.statusPending {
+  color: var(--color-pending);
+  background: color-mix(in srgb, var(--color-pending) 12%, transparent);
+}
+
+.statusApproved {
+  color: var(--color-purchased);
+  background: color-mix(in srgb, var(--color-purchased) 12%, transparent);
+}
+
+.statusRejected {
+  color: var(--color-error);
+  background: color-mix(in srgb, var(--color-error) 8%, transparent);
+}

@@ -7,6 +7,7 @@ import { useRemoveFinalDecision } from '../hooks/useRemoveFinalDecision'
 import { useRateOption } from '@/features/ratings/hooks/useRateOption'
 import { formatPrice } from '@/lib/formatters'
 import StarRating from '@/components/ui/StarRating'
+import ClaimSection from '@/features/claims/components/ClaimSection'
 import OptionForm from './OptionForm'
 import type { ItemOptionDto, UpdateOptionRequest } from '../types'
 import styles from './OptionCard.module.css'
@@ -15,9 +16,10 @@ interface Props {
   option: ItemOptionDto
   canEdit: boolean
   isOwner: boolean
+  isPurchased: boolean
 }
 
-const OptionCard = ({ option, canEdit, isOwner }: Props) => {
+const OptionCard = ({ option, canEdit, isOwner, isPurchased }: Props) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
 
@@ -184,6 +186,19 @@ const OptionCard = ({ option, canEdit, isOwner }: Props) => {
             </button>
           )}
         </div>
+      )}
+
+      {/* Claims section — only for finalized options */}
+      {option.isFinal && (
+        <ClaimSection
+          optionId={option.id}
+          itemId={option.itemId}
+          claims={option.claims}
+          approvedClaimsTotal={option.approvedClaimsTotal}
+          remainingClaimPercentage={option.remainingClaimPercentage}
+          canEdit={canEdit}
+          isPurchased={isPurchased}
+        />
       )}
 
       {/* Expanded details */}

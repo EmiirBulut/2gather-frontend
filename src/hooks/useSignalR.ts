@@ -69,6 +69,16 @@ interface OptionFinalRemovedPayload {
   itemId: string
 }
 
+interface ClaimCreatedPayload {
+  optionId: string
+  itemId: string
+}
+
+interface ClaimReviewedPayload {
+  optionId: string
+  itemId: string
+}
+
 // ─── Hook ────────────────────────────────────────────────────────────────────
 
 export function useSignalR(): void {
@@ -225,6 +235,22 @@ export function useSignalR(): void {
     offs.push(
       onEvent<OptionFinalRemovedPayload>('OptionFinalRemoved', ({ itemId }) => {
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.OPTIONS(itemId) })
+      })
+    )
+
+    // ── Claims ────────────────────────────────────────────────────────────
+
+    offs.push(
+      onEvent<ClaimCreatedPayload>('ClaimCreated', ({ optionId, itemId }) => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.OPTIONS(itemId) })
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CLAIMS(optionId) })
+      })
+    )
+
+    offs.push(
+      onEvent<ClaimReviewedPayload>('ClaimReviewed', ({ optionId, itemId }) => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.OPTIONS(itemId) })
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CLAIMS(optionId) })
       })
     )
 
