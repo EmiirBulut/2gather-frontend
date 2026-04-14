@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useSelectOption } from '../hooks/useSelectOption'
 import { useDeleteOption } from '../hooks/useDeleteOption'
 import { useUpdateOption } from '../hooks/useUpdateOption'
+import { formatPrice } from '@/lib/formatters'
 import OptionForm from './OptionForm'
 import type { ItemOptionDto, UpdateOptionRequest } from '../types'
 import styles from './OptionCard.module.css'
@@ -75,7 +76,7 @@ const OptionCard = ({ option, canEdit }: Props) => {
         {/* Price */}
         {option.price != null && (
           <span className={styles.price}>
-            {option.currency ?? '$'}{option.price.toLocaleString()}
+            {formatPrice(option.price)}
           </span>
         )}
 
