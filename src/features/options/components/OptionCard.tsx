@@ -82,11 +82,11 @@ const OptionCard = ({ option, canEdit }: Props) => {
 
         {/* Actions */}
         <div className={styles.actions}>
-          {option.notes && (
+          {(option.notes || option.brand || option.model || option.color) && (
             <button
               className={styles.actionBtn}
               onClick={() => setIsExpanded((v) => !v)}
-              aria-label={isExpanded ? 'Notları gizle' : 'Notları göster'}
+              aria-label={isExpanded ? 'Detayları gizle' : 'Detayları göster'}
             >
               <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
                 <path d="M7.5 1.5a6 6 0 1 0 0 12 6 6 0 0 0 0-12zm0 5v4m0-6.5v.5"
@@ -122,9 +122,35 @@ const OptionCard = ({ option, canEdit }: Props) => {
         </div>
       </div>
 
-      {/* Notes */}
-      {isExpanded && option.notes && (
-        <div className={styles.notes}>{option.notes}</div>
+      {/* Expanded details */}
+      {isExpanded && (
+        <div className={styles.details}>
+          {(option.brand || option.model || option.color) && (
+            <div className={styles.detailGrid}>
+              {option.brand && (
+                <div className={styles.detailItem}>
+                  <span className={styles.detailLabel}>Marka</span>
+                  <span className={styles.detailValue}>{option.brand}</span>
+                </div>
+              )}
+              {option.model && (
+                <div className={styles.detailItem}>
+                  <span className={styles.detailLabel}>Model</span>
+                  <span className={styles.detailValue}>{option.model}</span>
+                </div>
+              )}
+              {option.color && (
+                <div className={styles.detailItem}>
+                  <span className={styles.detailLabel}>Renk</span>
+                  <span className={styles.detailValue}>{option.color}</span>
+                </div>
+              )}
+            </div>
+          )}
+          {option.notes && (
+            <p className={styles.notes}>{option.notes}</p>
+          )}
+        </div>
       )}
 
       {/* Edit form */}

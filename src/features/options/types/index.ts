@@ -40,6 +40,9 @@ export interface CreateOptionRequest {
   currency?: string
   link?: string
   notes?: string
+  brand?: string
+  model?: string
+  color?: string
 }
 
 export interface UpdateOptionRequest {
@@ -48,4 +51,7 @@ export interface UpdateOptionRequest {
   currency?: string
   link?: string
   notes?: string
+  brand?: string
+  model?: string
+  color?: string
 }

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { formatPrice } from '@/lib/formatters'
 import { useOptions } from '../hooks/useOptions'
 import { useCreateOption } from '../hooks/useCreateOption'
 import { useMarkPurchased } from '@/features/items/hooks/useMarkPurchased'
@@ -93,7 +94,7 @@ const ItemDetailModal = ({ item, listId, onClose }: Props) => {
             {displayPrice != null && (
               <div className={styles.estimatedPrice}>
                 <span className={styles.priceValue}>
-                  ${displayPrice.toLocaleString()}
+                  {formatPrice(displayPrice)}
                 </span>
                 <span className={styles.priceLabel}>Tahmini</span>
               </div>
