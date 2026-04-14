@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { markPurchased } from '../api/itemsApi'
 import { QUERY_KEYS } from '@/lib/queryKeys'
 import type { ApiError } from '@/services/api'
-import type { BackendItemDto, ItemDto } from '../types'
+import type { ItemDto } from '../types'
 
 interface Variables {
   itemId: string
@@ -12,7 +12,7 @@ interface Variables {
 export function useMarkPurchased() {
   const queryClient = useQueryClient()
 
-  return useMutation<BackendItemDto, ApiError, Variables>({
+  return useMutation<void, ApiError, Variables>({
     mutationFn: ({ itemId }) => markPurchased(itemId),
 
     // Optimistic update: remove from Pending immediately

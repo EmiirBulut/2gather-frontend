@@ -1,3 +1,4 @@
+import { formatPrice } from '@/lib/formatters'
 import type { ListSummaryReport } from '../types'
 import styles from './SummaryCards.module.css'
 
@@ -14,7 +15,7 @@ const SummaryCards = ({ data }: Props) => {
     { label: 'Toplam Ürün', value: data.totalItems.toString() },
     { label: 'Tamamlanan', value: data.purchasedCount.toString(), accent: 'purchased' },
     { label: 'Bekleyen', value: data.pendingCount.toString(), accent: 'pending' },
-    { label: 'Harcanan', value: `$${data.totalSpent.toLocaleString()}`, accent: 'primary' },
+    { label: 'Harcanan', value: formatPrice(data.totalSpent), accent: 'primary' },
   ]
 
   return (
@@ -22,7 +23,7 @@ const SummaryCards = ({ data }: Props) => {
       <div className={styles.overview}>
         <p className={styles.overviewLabel}>Finansal Genel Bakış</p>
         <p className={styles.totalInvestment}>
-          ${data.estimatedTotal.toLocaleString()}
+          {formatPrice(data.estimatedTotal)}
         </p>
         <p className={styles.investmentLabel}>Tahmini Toplam</p>
 

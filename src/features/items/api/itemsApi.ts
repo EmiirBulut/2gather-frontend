@@ -42,9 +42,8 @@ export async function createItem(data: CreateItemRequest): Promise<ItemDto> {
   return toItemDto(itemResponse.data, categoryMap)
 }
 
-export async function markPurchased(itemId: string): Promise<BackendItemDto> {
-  const response = await apiClient.patch<BackendItemDto>(`/api/items/${itemId}/purchased`)
-  return response.data
+export async function markPurchased(itemId: string): Promise<void> {
+  await apiClient.patch(`/api/items/${itemId}/status`, { status: 1 })
 }
 
 export async function deleteItem(itemId: string): Promise<void> {
