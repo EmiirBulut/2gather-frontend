@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { useSelectOption } from '../hooks/useSelectOption'
 import { useDeleteOption } from '../hooks/useDeleteOption'
 import { useUpdateOption } from '../hooks/useUpdateOption'
+import { useRateOption } from '@/features/ratings/hooks/useRateOption'
 import { formatPrice } from '@/lib/formatters'
+import StarRating from '@/components/ui/StarRating'
 import OptionForm from './OptionForm'
 import type { ItemOptionDto, UpdateOptionRequest } from '../types'
 import styles from './OptionCard.module.css'
@@ -19,6 +21,7 @@ const OptionCard = ({ option, canEdit }: Props) => {
   const { mutate: handleSelect } = useSelectOption(option.itemId)
   const { mutate: handleDelete, isPending: isDeleting } = useDeleteOption(option.itemId)
   const { mutate: handleUpdate, isPending: isUpdating, error: updateError } = useUpdateOption(option.itemId)
+  const { mutate: handleRate } = useRateOption(option.itemId)
 
   const handleSelectClick = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -38,6 +41,12 @@ const OptionCard = ({ option, canEdit }: Props) => {
       { onSuccess: () => setIsEditing(false) }
     )
   }
+
+  const handleRatingChange = (score: number) => {
+    handleRate({ optionId: option.id, score })
+  }
+
+  const hasDetails = !!(option.notes || option.brand || option.model || option.color)
 
   return (
     <div className={`${styles.card} ${option.isSelected ? styles.isSelected : ''}`}>
@@ -82,7 +91,7 @@ const OptionCard = ({ option, canEdit }: Props) => {
 
         {/* Actions */}
         <div className={styles.actions}>
-          {(option.notes || option.brand || option.model || option.color) && (
+          {hasDetails && (
             <button
               className={styles.actionBtn}
               onClick={() => setIsExpanded((v) => !v)}
@@ -120,6 +129,20 @@ const OptionCard = ({ option, canEdit }: Props) => {
             </>
           )}
         </div>
+      </div>
+
+      {/* Rating row — always visible */}
+      <div className={styles.ratingRow}>
+        <StarRating
+          value={option.currentUserScore}
+          onChange={canEdit ? handleRatingChange : undefined}
+          size="sm"
+        />
+        {option.totalRatings > 0 && (
+          <span className={styles.ratingMeta}>
+            {option.averageRating != null ? option.averageRating.toFixed(1) : '—'} · {option.totalRatings} oy
+          </span>
+        )}
       </div>
 
       {/* Expanded details */}

@@ -1,0 +1,43 @@
+.stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.star {
+  background: none;
+  border: none;
+  padding: 0;
+  line-height: 1;
+  cursor: pointer;
+  transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
+.star:disabled {
+  cursor: default;
+}
+
+.star:not(:disabled):hover {
+  transform: scale(1.15);
+}
+
+.filled {
+  color: var(--color-primary);
+}
+
+.empty {
+  color: var(--color-border);
+}
+
+/* Size variants */
+.sm .star {
+  font-size: 14px;
+}
+
+.md .star {
+  font-size: 18px;
+}
+
+.readOnly .star {
+  pointer-events: none;
+}

@@ -56,6 +56,11 @@ interface MemberRemovedPayload {
   userId: string
 }
 
+interface OptionRatingUpdatedPayload {
+  optionId: string
+  itemId: string
+}
+
 // ─── Hook ────────────────────────────────────────────────────────────────────
 
 export function useSignalR(): void {
@@ -190,6 +195,14 @@ export function useSignalR(): void {
           QUERY_KEYS.OPTIONS(itemId),
           (old) => old?.filter((o) => o.id !== optionId)
         )
+      })
+    )
+
+    // ── Ratings ───────────────────────────────────────────────────────────
+
+    offs.push(
+      onEvent<OptionRatingUpdatedPayload>('OptionRatingUpdated', ({ itemId }) => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.OPTIONS(itemId) })
       })
     )
 
