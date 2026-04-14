@@ -61,6 +61,14 @@ interface OptionRatingUpdatedPayload {
   itemId: string
 }
 
+interface OptionFinalizedPayload {
+  itemId: string
+}
+
+interface OptionFinalRemovedPayload {
+  itemId: string
+}
+
 // ─── Hook ────────────────────────────────────────────────────────────────────
 
 export function useSignalR(): void {
@@ -202,6 +210,20 @@ export function useSignalR(): void {
 
     offs.push(
       onEvent<OptionRatingUpdatedPayload>('OptionRatingUpdated', ({ itemId }) => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.OPTIONS(itemId) })
+      })
+    )
+
+    // ── Final decision ────────────────────────────────────────────────────
+
+    offs.push(
+      onEvent<OptionFinalizedPayload>('OptionFinalized', ({ itemId }) => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.OPTIONS(itemId) })
+      })
+    )
+
+    offs.push(
+      onEvent<OptionFinalRemovedPayload>('OptionFinalRemoved', ({ itemId }) => {
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.OPTIONS(itemId) })
       })
     )

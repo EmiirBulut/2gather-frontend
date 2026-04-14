@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useSelectOption } from '../hooks/useSelectOption'
 import { useDeleteOption } from '../hooks/useDeleteOption'
 import { useUpdateOption } from '../hooks/useUpdateOption'
+import { useSetFinalOption } from '../hooks/useSetFinalOption'
+import { useRemoveFinalDecision } from '../hooks/useRemoveFinalDecision'
 import { useRateOption } from '@/features/ratings/hooks/useRateOption'
 import { formatPrice } from '@/lib/formatters'
 import StarRating from '@/components/ui/StarRating'
@@ -12,9 +14,10 @@ import styles from './OptionCard.module.css'
 interface Props {
   option: ItemOptionDto
   canEdit: boolean
+  isOwner: boolean
 }
 
-const OptionCard = ({ option, canEdit }: Props) => {
+const OptionCard = ({ option, canEdit, isOwner }: Props) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
 
@@ -22,6 +25,8 @@ const OptionCard = ({ option, canEdit }: Props) => {
   const { mutate: handleDelete, isPending: isDeleting } = useDeleteOption(option.itemId)
   const { mutate: handleUpdate, isPending: isUpdating, error: updateError } = useUpdateOption(option.itemId)
   const { mutate: handleRate } = useRateOption(option.itemId)
+  const { mutate: handleSetFinal, isPending: isSettingFinal } = useSetFinalOption(option.itemId)
+  const { mutate: handleRemoveFinal, isPending: isRemovingFinal } = useRemoveFinalDecision(option.itemId)
 
   const handleSelectClick = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -47,9 +52,22 @@ const OptionCard = ({ option, canEdit }: Props) => {
   }
 
   const hasDetails = !!(option.notes || option.brand || option.model || option.color)
+  // Non-owner cannot edit/delete a finalized option
+  const canMutate = canEdit && !(option.isFinal && !isOwner)
 
   return (
-    <div className={`${styles.card} ${option.isSelected ? styles.isSelected : ''}`}>
+    <div className={`${styles.card} ${option.isSelected ? styles.isSelected : ''} ${option.isFinal ? styles.isFinal : ''}`}>
+
+      {/* Final badge */}
+      {option.isFinal && (
+        <div className={styles.finalBadge}>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Nihai Seçim
+        </div>
+      )}
+
       <div className={styles.header}>
         {/* Select radio */}
         <button
@@ -103,7 +121,7 @@ const OptionCard = ({ option, canEdit }: Props) => {
               </svg>
             </button>
           )}
-          {canEdit && (
+          {canMutate && (
             <>
               <button
                 className={styles.actionBtn}
@@ -131,7 +149,7 @@ const OptionCard = ({ option, canEdit }: Props) => {
         </div>
       </div>
 
-      {/* Rating row — always visible */}
+      {/* Rating row */}
       <div className={styles.ratingRow}>
         <StarRating
           value={option.currentUserScore}
@@ -144,6 +162,29 @@ const OptionCard = ({ option, canEdit }: Props) => {
           </span>
         )}
       </div>
+
+      {/* Final decision button (owner only) */}
+      {isOwner && (
+        <div className={styles.finalRow}>
+          {option.isFinal ? (
+            <button
+              className={`${styles.finalBtn} ${styles.finalBtnRemove}`}
+              onClick={() => handleRemoveFinal(option.id)}
+              disabled={isRemovingFinal}
+            >
+              Kararı Kaldır
+            </button>
+          ) : (
+            <button
+              className={styles.finalBtn}
+              onClick={() => handleSetFinal(option.id)}
+              disabled={isSettingFinal}
+            >
+              Nihai Karar Ver
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Expanded details */}
       {isExpanded && (
