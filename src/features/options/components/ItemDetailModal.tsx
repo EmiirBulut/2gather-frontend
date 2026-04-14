@@ -8,6 +8,7 @@ import { usePermission } from '@/hooks/usePermission'
 import OptionCard from './OptionCard'
 import OptionForm from './OptionForm'
 import Button from '@/components/ui/Button'
+import PendingClaimsPanel from '@/features/claims/components/PendingClaimsPanel'
 import { QUERY_KEYS } from '@/lib/queryKeys'
 import type { ItemDto } from '@/features/items/types'
 import type { CreateOptionRequest } from '../types'
@@ -27,7 +28,7 @@ const ItemDetailModal = ({ item, listId, onClose }: Props) => {
 
   const { data: options, isLoading: isOptionsLoading } = useOptions(item.id)
   const { mutate: handleAddOption, isPending: isAdding, error: addError } = useCreateOption(item.id)
-  const { mutate: handleMarkPurchased, isPending: isMarkingPurchased } = useMarkPurchased()
+  const { mutate: handleMarkPurchased, isPending: isMarkingPurchased, error: purchaseError } = useMarkPurchased()
 
   const queryClient = useQueryClient()
   const { mutate: refreshItems } = useMutation({
@@ -110,9 +111,17 @@ const ItemDetailModal = ({ item, listId, onClose }: Props) => {
                 >
                   ✓ Satın Alındı Olarak İşaretle
                 </Button>
+                {purchaseError && (
+                  <p className={styles.purchaseError}>{purchaseError.message}</p>
+                )}
               </div>
             )}
           </div>
+
+          {/* Pending claims panel — owner only */}
+          {isOwner && options && options.length > 0 && (
+            <PendingClaimsPanel itemId={item.id} options={options} />
+          )}
 
           {/* Sourcing Options section */}
           <div className={styles.section}>
@@ -141,7 +150,13 @@ const ItemDetailModal = ({ item, listId, onClose }: Props) => {
               )}
 
               {options?.map((option) => (
-                <OptionCard key={option.id} option={option} canEdit={canEdit} isOwner={isOwner} />
+                <OptionCard
+                  key={option.id}
+                  option={option}
+                  canEdit={canEdit}
+                  isOwner={isOwner}
+                  isPurchased={item.status === 'Purchased'}
+                />
               ))}
             </div>
 

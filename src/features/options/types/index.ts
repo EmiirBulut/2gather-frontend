@@ -1,12 +1,13 @@
 // ─── Options Feature Types ────────────────────────────────────────────────────
 
+export type BackendClaimStatus = 0 | 1 | 2 // 0=Pending, 1=Approved, 2=Rejected
+
 export interface ClaimDto {
   id: string
-  optionId: string
   userId: string
   displayName: string
   percentage: number
-  status: 'Pending' | 'Approved' | 'Rejected'
+  status: BackendClaimStatus
   createdAt: string
 }
 

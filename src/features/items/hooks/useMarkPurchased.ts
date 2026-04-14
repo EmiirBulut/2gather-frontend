@@ -9,6 +9,9 @@ interface Variables {
   listId: string
 }
 
+const FORBIDDEN_MESSAGE =
+  'Bu ürünü satın alındı olarak işaretlemek için onaylı talip olmanız veya liste sahibi olmanız gerekiyor.'
+
 export function useMarkPurchased() {
   const queryClient = useQueryClient()
 
@@ -31,11 +34,15 @@ export function useMarkPurchased() {
       return { previous, listId }
     },
 
-    onError: (_err, _vars, context) => {
+    onError: (err, _vars, context) => {
       // Roll back on failure
       const ctx = context as { previous: ItemDto[] | undefined; listId: string } | undefined
       if (ctx?.previous) {
         queryClient.setQueryData(QUERY_KEYS.ITEMS(ctx.listId, 'Pending'), ctx.previous)
+      }
+      // Enrich 403 with a user-friendly message
+      if (err.statusCode === 403) {
+        err.message = FORBIDDEN_MESSAGE
       }
     },
 
