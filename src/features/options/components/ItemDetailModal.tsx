@@ -23,7 +23,7 @@ interface Props {
 
 const ItemDetailModal = ({ item, listId, onClose }: Props) => {
   const [isAddingOption, setIsAddingOption] = useState(false)
-  const { canEdit } = usePermission(listId)
+  const { canEdit, isOwner } = usePermission(listId)
 
   const { data: options, isLoading: isOptionsLoading } = useOptions(item.id)
   const { mutate: handleAddOption, isPending: isAdding, error: addError } = useCreateOption(item.id)
@@ -141,7 +141,7 @@ const ItemDetailModal = ({ item, listId, onClose }: Props) => {
               )}
 
               {options?.map((option) => (
-                <OptionCard key={option.id} option={option} canEdit={canEdit} />
+                <OptionCard key={option.id} option={option} canEdit={canEdit} isOwner={isOwner} />
               ))}
             </div>
 

@@ -32,3 +32,11 @@ export async function selectOption(id: string): Promise<ItemOptionDto> {
 export async function deleteOption(id: string): Promise<void> {
   await apiClient.delete(`/api/options/${id}`)
 }
+
+export async function setFinalOption(optionId: string): Promise<void> {
+  await apiClient.patch(`/api/options/${optionId}/finalize`)
+}
+
+export async function removeFinalDecision(optionId: string): Promise<void> {
+  await apiClient.delete(`/api/options/${optionId}/finalize`)
+}
