@@ -21,4 +21,7 @@ export const QUERY_KEYS = {
   // Reports
   REPORTS_SUMMARY: (listId: string) => ['reports', 'summary', listId] as const,
   REPORTS_CATEGORY: (listId: string) => ['reports', 'category', listId] as const,
+
+  // Ratings
+  RATINGS: (optionId: string) => ['ratings', optionId] as const,
 } as const
