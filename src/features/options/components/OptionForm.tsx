@@ -16,9 +16,11 @@ const optionSchema = z.object({
     .optional()
     .transform((v) => (v && v.trim() !== '' ? parseFloat(v) : undefined))
     .pipe(z.number().positive('Fiyat pozitif olmalı').optional()),
-  currency: z.string().max(10).optional(),
   link: z.string().url('Geçerli bir URL girin').optional().or(z.literal('')),
   notes: z.string().max(500).optional(),
+  brand: z.string().max(100).optional(),
+  model: z.string().max(100).optional(),
+  color: z.string().max(50).optional(),
 })
 
 type OptionFormData = z.infer<typeof optionSchema>
@@ -33,9 +35,11 @@ interface Props {
   onSubmit: (data: {
     title: string
     price?: number
-    currency?: string
     link?: string
     notes?: string
+    brand?: string
+    model?: string
+    color?: string
   }) => void
   onCancel: () => void
 }
@@ -51,9 +55,11 @@ const OptionForm = ({ existing, isPending, error, onSubmit, onCancel }: Props) =
     defaultValues: {
       title: existing?.title ?? '',
       price: existing?.price != null ? String(existing.price) as unknown as number : undefined,
-      currency: existing?.currency ?? 'USD',
       link: existing?.link ?? '',
       notes: existing?.notes ?? '',
+      brand: existing?.brand ?? '',
+      model: existing?.model ?? '',
+      color: existing?.color ?? '',
     },
   })
 
@@ -65,9 +71,11 @@ const OptionForm = ({ existing, isPending, error, onSubmit, onCancel }: Props) =
     onSubmit({
       title: data.title,
       price: data.price,
-      currency: data.currency || undefined,
       link: data.link || undefined,
       notes: data.notes || undefined,
+      brand: data.brand || undefined,
+      model: data.model || undefined,
+      color: data.color || undefined,
     })
   }
 
@@ -80,21 +88,13 @@ const OptionForm = ({ existing, isPending, error, onSubmit, onCancel }: Props) =
         {...register('title')}
       />
 
-      <div className={styles.row}>
-        <Input
-          label="Fiyat"
-          type="number"
-          placeholder="0.00"
-          errorMessage={errors.price?.message}
-          {...register('price')}
-        />
-        <Input
-          label="Para Birimi"
-          placeholder="USD"
-          errorMessage={errors.currency?.message}
-          {...register('currency')}
-        />
-      </div>
+      <Input
+        label="Fiyat"
+        type="number"
+        placeholder="0.00"
+        errorMessage={errors.price?.message}
+        {...register('price')}
+      />
 
       <Input
         label="Bağlantı (URL)"
@@ -104,11 +104,33 @@ const OptionForm = ({ existing, isPending, error, onSubmit, onCancel }: Props) =
         {...register('link')}
       />
 
+      <div className={styles.row}>
+        <Input
+          label="Marka"
+          placeholder="Samsung, Bosch…"
+          errorMessage={errors.brand?.message}
+          {...register('brand')}
+        />
+        <Input
+          label="Model"
+          placeholder="Galaxy S24, Serie 8…"
+          errorMessage={errors.model?.message}
+          {...register('model')}
+        />
+      </div>
+
+      <Input
+        label="Renk"
+        placeholder="Beyaz, Siyah…"
+        errorMessage={errors.color?.message}
+        {...register('color')}
+      />
+
       <div>
         <label className={styles.fieldLabel}>Notlar</label>
         <textarea
           className={styles.textarea}
-          placeholder="Renk, model, teslimat süresi…"
+          placeholder="Ek bilgiler, teslimat süresi…"
           {...register('notes')}
         />
         {errors.notes && (
