@@ -38,7 +38,7 @@ const RegisterForm = () => {
     <form onSubmit={handleSubmit(handleRegister)} className={styles.form} noValidate>
       <div className={styles.fields}>
         <Input
-          label="AD SOYAD"
+          label="Ad Soyad"
           type="text"
           placeholder="Adınız Soyadınız"
           autoComplete="name"
@@ -46,7 +46,7 @@ const RegisterForm = () => {
           {...register('displayName')}
         />
         <Input
-          label="E-POSTA ADRESİ"
+          label="E-posta"
           type="email"
           placeholder="ad@ornek.com"
           autoComplete="email"
@@ -54,7 +54,7 @@ const RegisterForm = () => {
           {...register('email')}
         />
         <Input
-          label="ŞİFRE"
+          label="Şifre"
           type="password"
           placeholder="••••••••"
           autoComplete="new-password"
@@ -62,7 +62,7 @@ const RegisterForm = () => {
           {...register('password')}
         />
         <Input
-          label="ŞİFRE TEKRAR"
+          label="Şifre Tekrar"
           type="password"
           placeholder="••••••••"
           autoComplete="new-password"

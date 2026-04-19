@@ -11,6 +11,15 @@ export const ROUTES = {
   LIST_DETAIL: '/lists/:listId',
   LIST_DETAIL_WITH_ID: (listId: string) => `/lists/${listId}`,
 
+  ITEM_LIST: '/lists/:listId/items',
+  ITEM_LIST_WITH_ID: (listId: string) => `/lists/${listId}/items`,
+
+  ITEM_DETAIL: '/lists/:listId/items/:itemId',
+  ITEM_DETAIL_WITH_ID: (listId: string, itemId: string) => `/lists/${listId}/items/${itemId}`,
+
+  NEW_ITEM: '/lists/:listId/items/new',
+  NEW_ITEM_WITH_ID: (listId: string) => `/lists/${listId}/items/new`,
+
   REPORTS: '/lists/:listId/reports',
   REPORTS_WITH_ID: (listId: string) => `/lists/${listId}/reports`,
 

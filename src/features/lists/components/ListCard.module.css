@@ -197,6 +197,20 @@
   color: var(--color-text-primary);
 }
 
+.invitedStats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.invitedStat {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
 .deleteBtn {
   opacity: 0;
   transition: opacity var(--transition-fast);
