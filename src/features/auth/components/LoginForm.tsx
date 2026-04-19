@@ -42,7 +42,7 @@ const LoginForm = () => {
     <form onSubmit={handleSubmit(handleLogin)} className={styles.form} noValidate>
       <div className={styles.fields}>
         <Input
-          label="E-POSTA ADRESİ"
+          label="E-posta"
           type="email"
           placeholder="ad@ornek.com"
           autoComplete="email"
@@ -50,7 +50,7 @@ const LoginForm = () => {
           {...register('email')}
         />
         <Input
-          label="ŞİFRE"
+          label="Şifre"
           type="password"
           placeholder="••••••••"
           autoComplete="current-password"
