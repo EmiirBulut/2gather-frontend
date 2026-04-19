@@ -11,25 +11,121 @@
   gap: var(--space-5);
 }
 
-.serverError {
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkboxLabel input[type='checkbox'] {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.forgotLink {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.forgotLink:hover {
+  color: var(--color-primary);
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 14px;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: var(--radius-md);
   font-family: var(--font-body);
-  font-size: var(--text-body-sm);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background var(--transition-fast);
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: 12px;
+  color: var(--color-text-muted);
+  letter-spacing: 0.06em;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.googleBtn {
+  width: 100%;
+  padding: 12px;
+  background: #fff;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.googleBtn:hover {
+  border-color: var(--color-border-input);
+  background: var(--color-bg-tag);
+}
+
+.serverError {
+  font-size: 13px;
   color: var(--color-danger);
-  background-color: color-mix(in srgb, var(--color-danger) 8%, transparent);
+  background: #fef2f2;
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-sm);
 }
 
 .switchLink {
-  font-family: var(--font-body);
-  font-size: var(--text-body-sm);
-  color: var(--color-on-surface-variant);
+  font-size: 13px;
+  color: var(--color-text-secondary);
   text-align: center;
 }
 
 .switchLink a {
   color: var(--color-primary);
-  font-weight: 500;
+  font-weight: 600;
   text-decoration: none;
 }
 
