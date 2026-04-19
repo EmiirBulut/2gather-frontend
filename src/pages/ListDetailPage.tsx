@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useItems } from '@/features/items/hooks/useItems'
 import { useListDetail } from '@/features/lists/hooks/useListDetail'
@@ -6,7 +6,6 @@ import { useCategories } from '@/features/categories/hooks/useCategories'
 import { useListStore } from '@/store/listStore'
 import { useSignalR } from '@/hooks/useSignalR'
 import { ROUTES } from '@/router/routes'
-import AddItemModal from '@/features/items/components/AddItemModal'
 import styles from './ListDetailPage.module.css'
 
 const CATEGORY_ICONS: Record<string, { icon: string; bg: string }> = {
@@ -39,8 +38,6 @@ const ListDetailPage = () => {
   const { listId } = useParams<{ listId: string }>()
   const navigate = useNavigate()
   const setActiveListId = useListStore((s) => s.setActiveListId)
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-
   if (listId) setActiveListId(listId)
 
   const { data: listDetail } = useListDetail(listId ?? '')
@@ -178,16 +175,13 @@ const ListDetailPage = () => {
         </div>
       )}
 
-      <button className={styles.fab} onClick={() => setIsAddModalOpen(true)}>
+      <button className={styles.fab} onClick={() => navigate(ROUTES.NEW_ITEM_WITH_ID(listId ?? ''))}>
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
           <path d="M7 1v12M1 7h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
         </svg>
         Yeni Kalem Ekle
       </button>
 
-      {isAddModalOpen && (
-        <AddItemModal listId={listId} onClose={() => setIsAddModalOpen(false)} />
-      )}
     </div>
   )
 }
