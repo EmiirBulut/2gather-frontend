@@ -14,6 +14,7 @@ const InviteAcceptPage = lazy(() => import('@/pages/InviteAcceptPage'))
 const ListSelectorPage = lazy(() => import('@/pages/ListSelectorPage'))
 const ListDetailPage = lazy(() => import('@/pages/ListDetailPage'))
 const ItemListPage = lazy(() => import('@/pages/ItemListPage'))
+const ItemDetailPage = lazy(() => import('@/pages/ItemDetailPage'))
 const ReportsPage = lazy(() => import('@/pages/ReportsPage'))
 const MembersPage = lazy(() => import('@/pages/MembersPage'))
 
@@ -68,6 +69,7 @@ export const router = createBrowserRouter([
         children: [
           { path: ROUTES.LIST_DETAIL, element: withSuspense(<ListDetailPage />) },
           { path: ROUTES.ITEM_LIST, element: withSuspense(<ItemListPage />) },
+          { path: ROUTES.ITEM_DETAIL, element: withSuspense(<ItemDetailPage />) },
           { path: ROUTES.REPORTS, element: withSuspense(<ReportsPage />) },
           { path: ROUTES.MEMBERS, element: withSuspense(<MembersPage />) },
         ],

@@ -1,0 +1,268 @@
+.page {
+  width: 100%;
+}
+
+/* ── Two-column layout ── */
+.layout {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.leftCol {
+  flex: 1;
+  min-width: 0;
+}
+
+.rightCol {
+  width: 280px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Header ── */
+.eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 6px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 24px;
+}
+
+/* ── Product image ── */
+.imageWrapper {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  max-height: 380px;
+  background: var(--color-bg-tag);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.imagePlaceholder {
+  font-size: 80px;
+  opacity: 0.25;
+  padding: 60px;
+}
+
+.imageTags {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  display: flex;
+  gap: 8px;
+}
+
+.imageTag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--color-text-secondary);
+  letter-spacing: 0.04em;
+}
+
+/* ── Options section ── */
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 16px;
+}
+
+.optionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 80px;
+}
+
+/* ── Right panel cards ── */
+.panelCard {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+
+.panelCardTitle {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 4px;
+}
+
+.panelPill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-tag);
+  color: var(--color-text-muted);
+  margin-left: 8px;
+}
+
+.panelCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.addOptionBtn {
+  width: 100%;
+  padding: 10px;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  margin-bottom: 14px;
+}
+
+.addOptionBtn:hover {
+  background: var(--color-primary-hover);
+}
+
+.panelDivider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 12px 0;
+}
+
+.panelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.panelRowLabel {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.panelRowValue {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+/* Teknik Detaylar */
+.techEyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 12px;
+}
+
+.techGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.techItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.techLabel {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.techValue {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* Planlama Notu */
+.noteCard {
+  background: var(--color-bg-dark-card);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+
+.noteHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.noteTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-on-dark);
+}
+
+.noteText {
+  font-size: 13px;
+  color: var(--color-text-on-dark-muted);
+  line-height: 1.6;
+}
+
+/* Mark purchased */
+.purchasedBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--color-status-purchased-bg);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-status-purchased);
+  margin-bottom: 14px;
+}
+
+.markPurchasedBtn {
+  width: 100%;
+  padding: 10px;
+  background: var(--color-bg-tag);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.markPurchasedBtn:hover {
+  background: var(--color-status-purchased-bg);
+  color: var(--color-status-purchased);
+  border-color: var(--color-status-purchased);
+}
