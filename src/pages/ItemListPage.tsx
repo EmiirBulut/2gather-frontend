@@ -7,7 +7,6 @@ import { useListStore } from '@/store/listStore'
 import { useSignalR } from '@/hooks/useSignalR'
 import { usePermission } from '@/hooks/usePermission'
 import { Breadcrumb } from '@/components/layout/Breadcrumb'
-import AddItemModal from '@/features/items/components/AddItemModal'
 import AddCategoryModal from '@/features/categories/components/AddCategoryModal'
 import { ROUTES } from '@/router/routes'
 import type { ItemDto } from '@/features/items/types'
@@ -47,7 +46,6 @@ const ItemListPage = () => {
   const setActiveListId = useListStore((s) => s.setActiveListId)
 
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
-  const [isAddItemOpen, setIsAddItemOpen] = useState(false)
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false)
 
   if (listId) setActiveListId(listId)
@@ -97,7 +95,7 @@ const ItemListPage = () => {
           <h1 className={styles.title}>İtem Listesi</h1>
         </div>
         {canEdit && (
-          <button className={styles.addBtn} onClick={() => setIsAddItemOpen(true)}>
+          <button className={styles.addBtn} onClick={() => navigate(ROUTES.NEW_ITEM_WITH_ID(listId))}>
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
               <path d="M7 1v12M1 7h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
             </svg>
@@ -192,10 +190,10 @@ const ItemListPage = () => {
               {canEdit && !selectedCategoryId && (
                 <div
                   className={styles.newCard}
-                  onClick={() => setIsAddItemOpen(true)}
+                  onClick={() => navigate(ROUTES.NEW_ITEM_WITH_ID(listId))}
                   role="button"
                   tabIndex={0}
-                  onKeyDown={(e) => e.key === 'Enter' && setIsAddItemOpen(true)}
+                  onKeyDown={(e) => e.key === 'Enter' && navigate(ROUTES.NEW_ITEM_WITH_ID(listId))}
                 >
                   <div className={styles.newCardIcon}>+</div>
                   <span className={styles.newCardLabel}>Yeni İtem Ekle</span>
@@ -210,9 +208,6 @@ const ItemListPage = () => {
         <CartIcon />
       </button>
 
-      {isAddItemOpen && (
-        <AddItemModal listId={listId} onClose={() => setIsAddItemOpen(false)} />
-      )}
       {isAddCategoryOpen && (
         <AddCategoryModal listId={listId} onClose={() => setIsAddCategoryOpen(false)} />
       )}
