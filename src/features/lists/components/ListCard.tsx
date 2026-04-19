@@ -5,49 +5,71 @@ import styles from './ListCard.module.css'
 
 interface Props {
   list: ListSummaryDto
+  isOwner: boolean
   onDelete: (id: string) => void
-  canDelete: boolean
 }
 
-const ListCard = ({ list, onDelete, canDelete }: Props) => {
+const ListCard = ({ list, isOwner, onDelete }: Props) => {
   const navigate = useNavigate()
 
-  const handleClick = () => {
-    navigate(ROUTES.LIST_DETAIL_WITH_ID(list.id))
-  }
+  const handleClick = () => navigate(ROUTES.LIST_DETAIL_WITH_ID(list.id))
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation()
     onDelete(list.id)
   }
 
+  const avatarCount = Math.min(list.memberCount, 3)
+
   return (
-    <div className={styles.card} onClick={handleClick} role="button" tabIndex={0}
-      onKeyDown={(e) => e.key === 'Enter' && handleClick()}>
-      <div className={styles.header}>
-        <h3 className={styles.name}>{list.name}</h3>
-        {canDelete && (
+    <div
+      className={styles.card}
+      onClick={handleClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === 'Enter' && handleClick()}
+    >
+      <div className={styles.cardTop}>
+        <span className={`${styles.roleBadge} ${isOwner ? styles.roleBadgeOwner : styles.roleBadgeEditor}`}>
+          {isOwner ? 'SAHİP' : 'EDİTÖR'}
+        </span>
+        {isOwner && (
           <button
-            className={styles.deleteBtn}
+            className={styles.menuBtn}
             onClick={handleDelete}
             aria-label={`${list.name} listesini sil`}
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M2 4h12M5.333 4V2.667a1.333 1.333 0 0 1 1.334-1.334h2.666a1.333 1.333 0 0 1 1.334 1.334V4m2 0v9.333a1.333 1.333 0 0 1-1.334 1.334H4.667a1.333 1.333 0 0 1-1.334-1.334V4h9.334Z"
-                stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            ···
           </button>
         )}
       </div>
 
-      <div className={styles.footer}>
-        <div className={styles.memberCount}>
-          <div className={styles.memberDots}>
-            <div className={styles.memberDot}>
-              {list.memberCount}
-            </div>
+      <h3 className={styles.cardName}>{list.name}</h3>
+
+      <div className={styles.metaRow}>
+        <div className={styles.metaBox}>
+          <div className={styles.metaLabel}>Üyeler</div>
+          <div className={styles.avatarStack}>
+            {Array.from({ length: avatarCount }).map((_, i) => (
+              <div key={i} className={styles.avatar}>
+                {String.fromCharCode(65 + i)}
+              </div>
+            ))}
           </div>
-          <span>{list.memberCount} üye</span>
+        </div>
+        <div className={styles.metaBox}>
+          <div className={styles.metaLabel}>İlerleme</div>
+          <div className={styles.metaValue}>{list.memberCount} üye</div>
+        </div>
+      </div>
+
+      <div className={styles.progressSection}>
+        <div className={styles.progressHeader}>
+          <span className={styles.progressLabel}>Tamamlanma</span>
+          <span className={styles.progressPct}>0%</span>
+        </div>
+        <div className={styles.progressBar}>
+          <div className={styles.progressFill} style={{ width: '0%' }} />
         </div>
       </div>
     </div>
