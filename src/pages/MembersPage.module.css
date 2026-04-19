@@ -1,173 +1,96 @@
-/* MembersPage — Invite Collaborators referanslı */
-
 .page {
-  min-height: 100dvh;
-  background-color: var(--color-surface);
-  display: flex;
-  flex-direction: column;
+  width: 100%;
 }
 
-/* ── Navbar ── */
-.navbar {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-4) var(--space-6);
-  background-color: rgba(250, 250, 245, 0.85);
-  backdrop-filter: blur(20px);
+/* ── Header ── */
+.header {
+  margin-bottom: 36px;
 }
 
-.backBtn {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-family: var(--font-body);
-  font-size: var(--text-body-sm);
-  font-weight: 500;
-  color: var(--color-on-surface-variant);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-sm);
-  transition: background-color var(--transition-fast), color var(--transition-fast);
-}
-
-.backBtn:hover {
-  background-color: var(--color-surface-container-low);
-  color: var(--color-on-surface);
-}
-
-.navLogoMark {
-  font-family: var(--font-display);
-  font-size: var(--text-label-sm);
-  font-weight: 800;
-  color: var(--color-primary);
-  letter-spacing: 0.05em;
-}
-
-/* ── Hero ── */
-.hero {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-container) 100%);
-  padding: var(--space-8) var(--space-6) var(--space-8);
-}
-
-.heroInner {
-  max-width: 640px;
-  margin: 0 auto;
-}
-
-.heroLabel {
-  font-family: var(--font-body);
-  font-size: var(--text-label-sm);
+.eyebrow {
+  font-size: 11px;
   font-weight: 600;
-  color: rgba(250, 250, 245, 0.65);
+  color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  margin-bottom: var(--space-2);
+  margin-bottom: 6px;
 }
 
-.heroTitle {
+.title {
   font-family: var(--font-display);
-  font-size: var(--text-display-sm);
-  font-weight: 800;
-  color: var(--color-surface);
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-  margin-bottom: var(--space-3);
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.02em;
+  margin-bottom: 10px;
 }
 
-.heroSub {
-  font-family: var(--font-body);
-  font-size: var(--text-body-md);
-  color: rgba(250, 250, 245, 0.75);
-  line-height: 1.5;
+.subtitle {
+  font-size: 15px;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+  max-width: 560px;
 }
 
-/* ── Main ── */
-.main {
+/* ── Two-column layout ── */
+.layout {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.leftCol {
   flex: 1;
-  max-width: 640px;
-  margin: 0 auto;
-  width: 100%;
-  padding: var(--space-8) var(--space-6);
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-8);
+  gap: 32px;
+}
+
+.rightCol {
+  width: 300px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 /* ── Section ── */
-.sectionHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--space-4);
-}
+.section {}
 
 .sectionTitle {
-  font-family: var(--font-body);
-  font-size: var(--text-label-sm);
-  font-weight: 600;
-  color: var(--color-on-surface-variant);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-.memberCount {
-  font-family: var(--font-body);
-  font-size: var(--text-label-sm);
-  color: var(--color-on-surface-variant);
-}
-
-/* ── Invite button ── */
-.inviteBtn {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  width: 100%;
-  padding: var(--space-4) var(--space-5);
-  background-color: var(--color-surface-container-low);
-  border: none;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  font-family: var(--font-body);
-  font-size: var(--text-body-md);
-  font-weight: 500;
-  color: var(--color-primary);
-  transition: background-color var(--transition-fast);
-}
-
-.inviteBtn:hover {
-  background-color: var(--color-surface-container-highest);
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 16px;
 }
 
 /* ── Member list ── */
 .memberList {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: 10px;
 }
 
 .memberRow {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-4) var(--space-5);
-  background-color: var(--color-surface-container-low);
-  border-radius: var(--radius-md);
+  gap: 14px;
+  padding: 16px 20px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
 }
 
 .avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-full);
-  background-color: var(--color-primary);
-  color: var(--color-surface);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
   font-family: var(--font-body);
-  font-size: var(--text-body-sm);
+  font-size: 14px;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -184,56 +107,204 @@
 }
 
 .memberName {
-  font-family: var(--font-body);
-  font-size: var(--text-body-sm);
+  font-size: 14px;
   font-weight: 600;
-  color: var(--color-on-surface);
+  color: var(--color-text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .memberEmail {
-  font-family: var(--font-body);
-  font-size: var(--text-label-sm);
-  color: var(--color-on-surface-variant);
+  font-size: 12px;
+  color: var(--color-text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Role badges */
+/* ── Role badges ── */
 .roleBadge {
-  font-family: var(--font-body);
-  font-size: var(--text-label-sm);
-  font-weight: 600;
-  padding: 3px var(--space-2);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
   border-radius: var(--radius-full);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   flex-shrink: 0;
 }
 
 .roleOwner {
-  background-color: color-mix(in srgb, var(--color-primary) 12%, transparent);
-  color: var(--color-primary);
+  background: var(--color-badge-owner-bg);
+  color: var(--color-badge-owner-text);
 }
 
 .roleEditor {
-  background-color: color-mix(in srgb, var(--color-purchased) 12%, transparent);
-  color: var(--color-purchased);
+  background: var(--color-badge-editor-bg);
+  color: var(--color-badge-editor-text);
 }
 
 .roleViewer {
-  background-color: color-mix(in srgb, var(--color-pending) 12%, transparent);
-  color: var(--color-pending);
+  background: var(--color-badge-viewer-bg);
+  color: var(--color-badge-viewer-text);
+}
+
+/* ── Invite Card ── */
+.inviteCard {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+
+.inviteTitle {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 6px;
+}
+
+.inviteSubtitle {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.inviteField {
+  margin-bottom: 18px;
+}
+
+.inviteFieldLabel {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.inviteInput {
+  width: 100%;
+  border: none;
+  border-bottom: 1.5px solid var(--color-border-input);
+  background: transparent;
+  padding: 8px 4px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color var(--transition-base);
+}
+
+.inviteInput:focus {
+  border-bottom-color: var(--color-primary);
+}
+
+.inviteInput::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* ── Role chips ── */
+.roleChips {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.roleChip {
+  padding: 7px 16px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+  transition: all var(--transition-fast);
+}
+
+.roleChip:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.roleChipActive {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+.roleDesc {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.roleDesc strong {
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+/* ── Invite button ── */
+.inviteBtn {
+  width: 100%;
+  padding: 12px;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  margin-top: 4px;
+}
+
+.inviteBtn:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.inviteBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Info Card ── */
+.infoCard {
+  background: #FFF0EE;
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+}
+
+.infoCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: var(--color-text-secondary);
+}
+
+.infoCardTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.infoCardText {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  line-height: 1.55;
 }
 
 /* ── States ── */
-.memberSkeleton {
-  height: 72px;
-  border-radius: var(--radius-md);
-  background-color: var(--color-surface-container-low);
+.skeleton {
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-tag);
   animation: shimmer 1.4s ease-in-out infinite;
 }
 
@@ -243,16 +314,27 @@
 }
 
 .errorText {
-  font-family: var(--font-body);
-  font-size: var(--text-body-sm);
-  color: var(--color-error);
-  padding: var(--space-4);
-  background-color: color-mix(in srgb, var(--color-error) 8%, transparent);
-  border-radius: var(--radius-md);
+  font-size: 13px;
+  color: var(--color-danger);
+  background: #fef2f2;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
 }
 
-@media (max-width: 600px) {
-  .main {
-    padding: var(--space-6) var(--space-4);
-  }
+.emptyText {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.fieldError {
+  font-size: 12px;
+  color: var(--color-danger);
+  margin-top: 4px;
+}
+
+.successText {
+  font-size: 13px;
+  color: var(--color-primary);
+  font-weight: 500;
+  margin-bottom: 8px;
 }
