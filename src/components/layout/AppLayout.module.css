@@ -1,0 +1,12 @@
+.wrapper {
+  display: flex;
+  min-height: 100dvh;
+}
+
+.main {
+  margin-left: 210px;
+  flex: 1;
+  background: var(--color-bg-page);
+  padding: 40px;
+  min-height: 100dvh;
+}
