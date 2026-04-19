@@ -1,258 +1,192 @@
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useItems } from '@/features/items/hooks/useItems'
 import { useListDetail } from '@/features/lists/hooks/useListDetail'
-import { usePermission } from '@/hooks/usePermission'
-import StatusFilter from '@/features/items/components/StatusFilter'
-import ItemListGroup from '@/features/items/components/ItemListGroup'
-import AddItemModal from '@/features/items/components/AddItemModal'
-import ItemDetailModal from '@/features/options/components/ItemDetailModal'
-import CategoryFilter from '@/features/categories/components/CategoryFilter'
-import AddCategoryModal from '@/features/categories/components/AddCategoryModal'
+import { useCategories } from '@/features/categories/hooks/useCategories'
 import { useListStore } from '@/store/listStore'
 import { useSignalR } from '@/hooks/useSignalR'
-import OnlinePresence from '@/features/members/components/OnlinePresence'
 import { ROUTES } from '@/router/routes'
-import type { ItemDto, StatusFilter as StatusFilterType } from '@/features/items/types'
+import AddItemModal from '@/features/items/components/AddItemModal'
 import styles from './ListDetailPage.module.css'
+
+const CATEGORY_ICONS: Record<string, { icon: string; bg: string }> = {
+  salon: { icon: '🛋️', bg: '#E8F0EA' },
+  'yatak odası': { icon: '🛏️', bg: '#E8EDF5' },
+  mutfak: { icon: '🍳', bg: '#F5E8E8' },
+  banyo: { icon: '🚿', bg: '#E8F5F0' },
+  'çocuk odası': { icon: '🧸', bg: '#F5F0E8' },
+  default: { icon: '📦', bg: '#F0F0EE' },
+}
+
+const getCategoryStyle = (name: string) =>
+  CATEGORY_ICONS[name.toLowerCase()] ?? CATEGORY_ICONS.default
+
+const FinancialIcon = () => (
+  <div style={{
+    width: 36, height: 36, borderRadius: 8,
+    background: 'var(--color-primary-light)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+  }}>
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <rect x="1" y="4" width="16" height="11" rx="2" stroke="var(--color-primary)" strokeWidth="1.4"/>
+      <path d="M1 7.5h16" stroke="var(--color-primary)" strokeWidth="1.4"/>
+      <circle cx="5" cy="11" r="1" fill="var(--color-primary)"/>
+    </svg>
+  </div>
+)
 
 const ListDetailPage = () => {
   const { listId } = useParams<{ listId: string }>()
   const navigate = useNavigate()
   const setActiveListId = useListStore((s) => s.setActiveListId)
-
-  const [statusFilter, setStatusFilter] = useState<StatusFilterType>('Pending')
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false)
-  const [selectedItem, setSelectedItem] = useState<ItemDto | null>(null)
 
-  // Set active list in global store
   if (listId) setActiveListId(listId)
 
-  // Populate list detail cache (members embedded) for usePermission
-  useListDetail(listId ?? '')
+  const { data: listDetail } = useListDetail(listId ?? '')
+  const { data: allItems, isLoading: itemsLoading } = useItems(listId ?? '', 'All')
+  const { data: categories, isLoading: catsLoading } = useCategories(listId ?? '')
 
-  const { canEdit } = usePermission(listId ?? '')
-
-  // Real-time updates via SignalR
   useSignalR()
 
-  const { data: items, isLoading, isError } = useItems(listId ?? '', statusFilter)
-
-  // Group items by category, applying category filter if set
-  const groupedItems = useMemo(() => {
-    if (!items) return []
-    const filtered = selectedCategoryId
-      ? items.filter((i) => i.categoryId === selectedCategoryId)
-      : items
-    const map = new Map<string, { categoryName: string; items: ItemDto[] }>()
-    for (const item of filtered) {
-      if (!map.has(item.categoryId)) {
-        map.set(item.categoryId, { categoryName: item.categoryName, items: [] })
-      }
-      map.get(item.categoryId)!.items.push(item)
-    }
-    return Array.from(map.values())
-  }, [items, selectedCategoryId])
-
-  // Stats for completion bar
-  const totalCount = items?.length ?? 0
-  const purchasedCount = items?.filter((i) => i.status === 'Purchased').length ?? 0
+  const totalCount = allItems?.length ?? 0
+  const purchasedCount = allItems?.filter((i) => i.status === 'Purchased').length ?? 0
+  const pendingCount = totalCount - purchasedCount
   const completionPct = totalCount > 0 ? Math.round((purchasedCount / totalCount) * 100) : 0
 
-  const handleItemClick = (item: ItemDto) => {
-    setSelectedItem(item)
-    // Phase 5: will open ItemDetailModal
-  }
-
-  const handleBack = () => {
-    setActiveListId(null)
-    navigate(ROUTES.LISTS)
-  }
+  const categoryStats = useMemo(() => {
+    if (!allItems || !categories) return []
+    return categories.map((cat) => {
+      const catItems = allItems.filter((i) => i.categoryId === cat.id)
+      const catPurchased = catItems.filter((i) => i.status === 'Purchased').length
+      const pct = catItems.length > 0 ? Math.round((catPurchased / catItems.length) * 100) : 0
+      return { cat, total: catItems.length, purchased: catPurchased, pct }
+    })
+  }, [allItems, categories])
 
   if (!listId) {
     navigate(ROUTES.LISTS)
     return null
   }
 
+  const isLoading = itemsLoading || catsLoading
+
   return (
     <div className={styles.page}>
-      {/* Navbar */}
-      <nav className={styles.navbar}>
-        <div className={styles.navLeft}>
-          <button className={styles.backBtn} onClick={handleBack}>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M10 12 6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            Listeler
-          </button>
-          <div className={styles.navLogoMark}>2G</div>
+      {/* Header */}
+      <div className={styles.header}>
+        <div className={styles.headerLeft}>
+          <span className={styles.eyebrow}>PROJE DURUMU</span>
+          <h1 className={styles.title}>{listDetail?.name ?? '—'}</h1>
+          <p className={styles.subtitle}>Birlikte Planlayın</p>
         </div>
-        <div className={styles.navRight}>
-          <OnlinePresence listId={listId} />
-          <button
-            className={styles.backBtn}
-            onClick={() => navigate(ROUTES.MEMBERS_WITH_ID(listId))}
-          >
-            Üyeler
-          </button>
-          <button
-            className={styles.backBtn}
-            onClick={() => navigate(ROUTES.REPORTS_WITH_ID(listId))}
-          >
-            Rapor
-          </button>
-        </div>
-      </nav>
-
-      {/* Hero — Living Room Items görselindeki üst panel */}
-      <div className={styles.hero}>
-        <div className={styles.heroInner}>
-          <div className={styles.heroTop}>
-            <div>
-              <p className={styles.heroLabel}>Liste Detayı</p>
-              <h1 className={styles.heroTitle}>Ürün Listesi</h1>
-              <div className={styles.heroMeta}>
-                <div className={styles.heroMetaItem}>
-                  <span className={styles.heroMetaValue}>{totalCount}</span>
-                  <span className={styles.heroMetaLabel}>Toplam Ürün</span>
-                </div>
-                <div className={styles.heroMetaItem}>
-                  <span className={styles.heroMetaValue}>{totalCount - purchasedCount}</span>
-                  <span className={styles.heroMetaLabel}>Bekleyen</span>
-                </div>
-                <div className={styles.heroMetaItem}>
-                  <span className={styles.heroMetaValue}>{purchasedCount}</span>
-                  <span className={styles.heroMetaLabel}>Tamamlanan</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Completion bar */}
-          <div className={styles.completionBar}>
-            <div className={styles.completionLabel}>
-              <span className={styles.completionText}>Tamamlanma</span>
-              <span className={styles.completionPct}>{completionPct}%</span>
-            </div>
-            <div className={styles.progressTrack}>
-              <div
-                className={styles.progressFill}
-                style={{ width: `${completionPct}%` }}
-              />
-            </div>
+        <div className={styles.headerRight}>
+          <span className={styles.progressLabel}>Genel İlerleme %{completionPct}</span>
+          <div className={styles.progressTrack}>
+            <div className={styles.progressFill} style={{ width: `${completionPct}%` }} />
           </div>
         </div>
       </div>
 
-      {/* Main content */}
-      <main className={styles.main}>
-        {/* Filters */}
-        <div className={styles.filterBar}>
-          <StatusFilter
-            value={statusFilter}
-            onChange={setStatusFilter}
-            pendingCount={statusFilter === 'All' ? items?.filter((i) => i.status === 'Pending').length : undefined}
-            purchasedCount={statusFilter === 'All' ? purchasedCount : undefined}
-          />
-          <div className={styles.categoryFilterRow}>
-            <CategoryFilter
-              listId={listId}
-              selectedCategoryId={selectedCategoryId}
-              onChange={setSelectedCategoryId}
-            />
-            {canEdit && (
-              <button
-                className={styles.addCategoryBtn}
-                onClick={() => setIsAddCategoryOpen(true)}
-                aria-label="Kategori ekle"
-              >
-                <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                  <path d="M6.5 1v11M1 6.5h11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
-              </button>
-            )}
+      {/* Financial + Claims */}
+      <div className={styles.twoCol}>
+        <div className={styles.financialCard}>
+          <div className={styles.financialCardTop}>
+            <p className={styles.cardEyebrow}>FİNANSAL ÖZET</p>
+            <FinancialIcon />
+          </div>
+          <h2 className={styles.financialTitle}>Tahmini Toplam Bütçe</h2>
+          <p className={styles.financialSub}>Toplam Hedef</p>
+          <div className={styles.bigNumber}>₺ —</div>
+          <div className={styles.financialInner}>
+            <span className={styles.financialInnerLabel}>Harcanan Toplam</span>
+            <span className={styles.financialInnerValue}>₺ —</span>
           </div>
         </div>
 
-        {/* Item groups */}
-        <div className={styles.itemGroups}>
-          {isLoading && (
-            <>{[1, 2, 3, 4].map((i) => <div key={i} className={styles.skeleton} />)}</>
-          )}
-
-          {isError && (
-            <div className={styles.emptyState}>
-              <div className={styles.emptyIcon}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
-                    stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+        <div className={styles.claimsCard}>
+          <div className={styles.claimsHeader}>
+            <span className={styles.claimsTitle}>Bekleyen Talepler</span>
+            {pendingCount > 0 && (
+              <span className={styles.newBadge}>{pendingCount} Yeni</span>
+            )}
+          </div>
+          <div
+            className={styles.claimRow}
+            style={{ cursor: 'pointer' }}
+            onClick={() => navigate(ROUTES.ITEM_LIST_WITH_ID(listId))}
+          >
+            <div className={styles.claimLeft}>
+              <div className={styles.claimIcon}>📋</div>
+              <div>
+                <div className={styles.claimName}>İtem Listesi</div>
+                <div className={styles.claimDesc}>{totalCount} ürün · {pendingCount} bekliyor</div>
               </div>
-              <p className={styles.emptyTitle}>Ürünler yüklenemedi</p>
-              <p className={styles.emptySubtitle}>Bir hata oluştu. Sayfayı yenilemeyi deneyin.</p>
             </div>
-          )}
-
-          {!isLoading && !isError && groupedItems.length === 0 && (
-            <div className={styles.emptyState}>
-              <div className={styles.emptyIcon}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"
-                    stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-              <p className={styles.emptyTitle}>
-                {statusFilter === 'Pending' ? 'Bekleyen ürün yok' :
-                 statusFilter === 'Purchased' ? 'Henüz alınan ürün yok' :
-                 'Liste boş'}
-              </p>
-              <p className={styles.emptySubtitle}>
-                {statusFilter === 'Pending'
-                  ? 'Harika! Tüm ürünler tamamlandı.'
-                  : 'Ürün eklemek için + butonunu kullanın.'}
-              </p>
-            </div>
-          )}
-
-          {!isLoading && !isError && groupedItems.map((group) => (
-            <ItemListGroup
-              key={group.categoryName}
-              categoryName={group.categoryName}
-              items={group.items}
-              onItemClick={handleItemClick}
-            />
-          ))}
+            <button className={styles.inspectBtn}>İncele</button>
+          </div>
         </div>
-      </main>
+      </div>
 
-      {/* FAB */}
+      {/* Category Grid */}
+      <div className={styles.sectionHeader}>
+        <span className={styles.sectionTitle}>Proje Özeti</span>
+        <button
+          className={styles.allDetailsBtn}
+          onClick={() => navigate(ROUTES.ITEM_LIST_WITH_ID(listId))}
+        >
+          TÜM DETAYLAR →
+        </button>
+      </div>
+
+      {isLoading ? (
+        <div className={styles.skeletonGrid}>
+          {[1, 2, 3, 4, 5, 6].map((i) => <div key={i} className={styles.skeleton} />)}
+        </div>
+      ) : (
+        <div className={styles.categoryGrid}>
+          {categoryStats.map(({ cat, total, pct }) => {
+            const { icon, bg } = getCategoryStyle(cat.name)
+            const avatarCount = Math.min(total, 3)
+            return (
+              <div
+                key={cat.id}
+                className={styles.categoryCard}
+                onClick={() => navigate(ROUTES.ITEM_LIST_WITH_ID(listId))}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && navigate(ROUTES.ITEM_LIST_WITH_ID(listId))}
+              >
+                <div className={styles.categoryCardTop}>
+                  <div className={styles.categoryIcon} style={{ background: bg }}>{icon}</div>
+                  <span className={styles.categoryPct}>{pct}% Tamam</span>
+                </div>
+                <div className={styles.categoryName}>{cat.name}</div>
+                <div className={styles.categoryDesc}>{total} ürün</div>
+                {avatarCount > 0 && (
+                  <div className={styles.categoryAvatars}>
+                    {Array.from({ length: avatarCount }).map((_, i) => (
+                      <div key={i} className={styles.categoryAvatar}>
+                        {String.fromCharCode(65 + i)}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
+
       <button className={styles.fab} onClick={() => setIsAddModalOpen(true)}>
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <path d="M9 3v12M3 9h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M7 1v12M1 7h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
         </svg>
-        Ürün Ekle
+        Yeni Kalem Ekle
       </button>
 
-      {/* Modals */}
       {isAddModalOpen && (
         <AddItemModal listId={listId} onClose={() => setIsAddModalOpen(false)} />
-      )}
-
-      {selectedItem && (
-        <ItemDetailModal
-          item={selectedItem}
-          listId={listId}
-          onClose={() => setSelectedItem(null)}
-        />
-      )}
-
-      {isAddCategoryOpen && (
-        <AddCategoryModal
-          listId={listId}
-          onClose={() => setIsAddCategoryOpen(false)}
-        />
       )}
     </div>
   )

@@ -66,7 +66,7 @@ export const Sidebar = () => {
               Dashboard
             </NavLink>
             <NavLink
-              to={ROUTES.LIST_DETAIL_WITH_ID(listId)}
+              to={ROUTES.ITEM_LIST_WITH_ID(listId)}
               className={({ isActive }) =>
                 `${styles.navItem} ${isActive ? styles.navItemActive : ''}`
               }

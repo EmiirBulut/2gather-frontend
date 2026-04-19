@@ -53,6 +53,25 @@
   gap: 12px;
 }
 
+.bellBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.bellBtn:hover {
+  background: var(--color-bg-tag);
+  color: var(--color-text-primary);
+}
+
 .avatar {
   width: 40px;
   height: 40px;
