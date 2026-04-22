@@ -1,5 +1,5 @@
 import { apiClient } from '@/services/api'
-import type { InviteRequest } from '../types'
+import type { InviteMemberRequest, PendingInviteDto } from '../types'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -12,16 +12,24 @@ export interface InviteResponse {
 
 // ─── Members API Functions ────────────────────────────────────────────────────
 
-// Members are embedded in GET /api/lists/:id — see useListDetail.
-// Only invite is available as a write operation on the current backend.
-
 export async function inviteMember(
   listId: string,
-  data: InviteRequest
-): Promise<InviteResponse> {
-  const response = await apiClient.post<InviteResponse>(
-    `/api/lists/${listId}/members/invite`,
-    data
+  data: InviteMemberRequest
+): Promise<void> {
+  await apiClient.post(`/api/lists/${listId}/members/invite`, data)
+}
+
+export async function getPendingInvites(listId: string): Promise<PendingInviteDto[]> {
+  const response = await apiClient.get<PendingInviteDto[]>(
+    `/api/lists/${listId}/members/invites`
   )
   return response.data
+}
+
+export async function cancelInvite(listId: string, inviteId: string): Promise<void> {
+  await apiClient.delete(`/api/lists/${listId}/members/invites/${inviteId}`)
+}
+
+export async function resendInvite(listId: string, inviteId: string): Promise<void> {
+  await apiClient.post(`/api/lists/${listId}/members/invites/${inviteId}/resend`)
 }
