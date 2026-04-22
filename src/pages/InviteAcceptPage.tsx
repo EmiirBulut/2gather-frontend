@@ -7,9 +7,12 @@ import { normalizeError } from '@/services/api'
 import { ROUTES } from '@/router/routes'
 import styles from './InviteAcceptPage.module.css'
 
+export const PENDING_INVITE_KEY = 'pending-invite-token'
+
 const InviteAcceptPage = () => {
   const { token } = useParams<{ token: string }>()
   const navigate = useNavigate()
+  const accessToken = useAuthStore((s) => s.accessToken)
   const setAuth = useAuthStore((s) => s.setAuth)
 
   const { mutate, isPending, isError, error } = useMutation({
@@ -20,14 +23,25 @@ const InviteAcceptPage = () => {
     onSuccess: (data) => {
       setAuth(data.accessToken, data.user)
       sessionStorage.setItem('refresh-token', data.refreshToken)
+      sessionStorage.removeItem(PENDING_INVITE_KEY)
       navigate(ROUTES.LISTS)
     },
     onError: (err: unknown) => normalizeError(err),
   })
 
   useEffect(() => {
+    if (!token) return
+
+    if (!accessToken) {
+      // Kullanıcı giriş yapmamış — token'ı sakla, login'e yönlendir
+      sessionStorage.setItem(PENDING_INVITE_KEY, token)
+      navigate(ROUTES.LOGIN, { replace: true })
+      return
+    }
+
+    // Kullanıcı giriş yapmış — daveti direkt kabul et
     mutate()
-  }, [mutate])
+  }, [token, accessToken]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className={styles.page}>

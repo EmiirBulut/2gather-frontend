@@ -3,6 +3,7 @@ import { useReportsSummary, useCategoryReport } from '@/features/reports/hooks/u
 import { useItems } from '@/features/items/hooks/useItems'
 import { useListDetail } from '@/features/lists/hooks/useListDetail'
 import { Breadcrumb } from '@/components/layout/Breadcrumb'
+import SegmentedProgressBar from '@/components/ui/SegmentedProgressBar'
 import { formatPrice } from '@/lib/formatters'
 import { ROUTES } from '@/router/routes'
 import styles from './ReportsPage.module.css'
@@ -108,20 +109,25 @@ const ReportsPage = () => {
             {/* Category breakdown */}
             {!isCatLoading && categories && categories.length > 0 && (
               <div className={styles.catBreakdown}>
-                {categories.map((cat) => {
-                  const pct = cat.totalItems > 0
-                    ? Math.round((cat.purchasedCount / cat.totalItems) * 100)
-                    : 0
-                  return (
-                    <div key={cat.categoryId} className={styles.catRow}>
+                {categories.map((cat) => (
+                  <div key={cat.categoryId} className={styles.catRow}>
+                    <div className={styles.catRowHeader}>
                       <span className={styles.catName}>{cat.categoryName}</span>
-                      <div className={styles.catBar}>
-                        <div className={styles.catBarFill} style={{ width: `${pct}%` }} />
-                      </div>
-                      <span className={styles.catPct}>{pct}%</span>
+                      <span className={styles.catPct}>
+                        {cat.totalItems > 0
+                          ? Math.round((cat.purchasedCount / cat.totalItems) * 100)
+                          : 0}%
+                      </span>
                     </div>
-                  )
-                })}
+                    <SegmentedProgressBar
+                      total={cat.totalItems}
+                      completed={cat.purchasedCount}
+                    />
+                    <span className={styles.catSub}>
+                      {cat.purchasedCount}/{cat.totalItems} İTEM ALINDI
+                    </span>
+                  </div>
+                ))}
               </div>
             )}
           </div>
@@ -198,9 +204,9 @@ const ReportsPage = () => {
         )}
       </div>
 
-      <div className={styles.watermark}>
-        <span>{listName.toUpperCase()}</span><br />
-        <span>RAPORLAR / {new Date().getFullYear()}</span>
+      <div className={styles.pageFooter}>
+        <span>— DESIGN FOR COLLECTIVE PLANNING</span>
+        <span>2gather Reports v2.4 — {new Date().getFullYear()}</span>
       </div>
     </div>
   )
