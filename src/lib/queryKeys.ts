@@ -27,4 +27,7 @@ export const QUERY_KEYS = {
 
   // Claims
   CLAIMS: (optionId: string) => ['claims', optionId] as const,
+
+  // Pending invites
+  PENDING_INVITES: (listId: string) => ['pendingInvites', listId] as const,
 } as const
