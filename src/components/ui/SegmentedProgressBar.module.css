@@ -1,0 +1,19 @@
+.bar {
+  display: flex;
+  gap: 2px;
+  width: 100%;
+}
+
+.segment {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.segmentFilled {
+  background: var(--color-progress-fill);
+}
+
+.segmentEmpty {
+  background: var(--color-progress-bg);
+}
