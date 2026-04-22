@@ -4,6 +4,7 @@ import { login } from '../api/authApi'
 import { useAuthStore } from '@/store/authStore'
 import { normalizeError, type ApiError } from '@/services/api'
 import { ROUTES } from '@/router/routes'
+import { PENDING_INVITE_KEY } from '@/pages/InviteAcceptPage'
 import type { LoginRequest } from '../types'
 
 export function useLogin() {
@@ -17,7 +18,12 @@ export function useLogin() {
       sessionStorage.setItem('refresh-token', response.refreshToken)
     },
     onSuccess: () => {
-      navigate(ROUTES.LISTS)
+      const pendingToken = sessionStorage.getItem(PENDING_INVITE_KEY)
+      if (pendingToken) {
+        navigate(ROUTES.INVITE_WITH_TOKEN(pendingToken), { replace: true })
+      } else {
+        navigate(ROUTES.LISTS)
+      }
     },
     onError: (error: unknown) => {
       return normalizeError(error)
