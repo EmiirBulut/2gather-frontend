@@ -1,6 +1,9 @@
-import { NavLink, useParams } from 'react-router-dom'
+import { NavLink, useNavigate, useParams } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import { ROUTES } from '@/router/routes'
 import { useAuthStore } from '@/store/authStore'
+import { getListDetail } from '@/features/lists/api/listsApi'
+import { QUERY_KEYS } from '@/lib/queryKeys'
 import styles from './Sidebar.module.css'
 
 const HomeIcon = () => (
@@ -30,6 +33,12 @@ const UsersIcon = () => (
   </svg>
 )
 
+const BackIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M9 11.5L4.5 7 9 2.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+)
+
 const SettingsIcon = () => (
   <svg className={styles.navIcon} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="8" cy="8" r="2" stroke="currentColor" strokeWidth="1.3"/>
@@ -39,7 +48,14 @@ const SettingsIcon = () => (
 
 export const Sidebar = () => {
   const { listId } = useParams<{ listId: string }>()
+  const navigate = useNavigate()
   const user = useAuthStore((s) => s.user)
+
+  const { data: listDetail } = useQuery({
+    queryKey: QUERY_KEYS.LIST_DETAIL(listId!),
+    queryFn: () => getListDetail(listId!),
+    enabled: Boolean(listId),
+  })
 
   const initials = user?.displayName
     ? user.displayName.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()
@@ -55,43 +71,57 @@ export const Sidebar = () => {
       <nav className={styles.nav}>
         {listId ? (
           <>
-            <NavLink
-              to={ROUTES.LIST_DETAIL_WITH_ID(listId)}
-              end
-              className={({ isActive }) =>
-                `${styles.navItem} ${isActive ? styles.navItemActive : ''}`
-              }
+            <button
+              className={styles.backLink}
+              onClick={() => navigate(ROUTES.LISTS)}
             >
-              <HomeIcon />
-              Dashboard
-            </NavLink>
-            <NavLink
-              to={ROUTES.ITEM_LIST_WITH_ID(listId)}
-              className={({ isActive }) =>
-                `${styles.navItem} ${isActive ? styles.navItemActive : ''}`
-              }
-            >
-              <ListIcon />
-              İtem Listesi
-            </NavLink>
-            <NavLink
-              to={ROUTES.REPORTS_WITH_ID(listId)}
-              className={({ isActive }) =>
-                `${styles.navItem} ${isActive ? styles.navItemActive : ''}`
-              }
-            >
-              <ChartIcon />
-              Raporlar
-            </NavLink>
-            <NavLink
-              to={ROUTES.MEMBERS_WITH_ID(listId)}
-              className={({ isActive }) =>
-                `${styles.navItem} ${isActive ? styles.navItemActive : ''}`
-              }
-            >
-              <UsersIcon />
-              Üyeler
-            </NavLink>
+              <BackIcon />
+              {listDetail ? (
+                <span className={styles.backLinkName}>{listDetail.name}</span>
+              ) : (
+                <span className={styles.backLinkSkeleton} />
+              )}
+            </button>
+
+            <div className={styles.planNav}>
+              <NavLink
+                to={ROUTES.LIST_DETAIL_WITH_ID(listId)}
+                end
+                className={({ isActive }) =>
+                  `${styles.navItem} ${isActive ? styles.navItemActive : ''}`
+                }
+              >
+                <HomeIcon />
+                Dashboard
+              </NavLink>
+              <NavLink
+                to={ROUTES.ITEM_LIST_WITH_ID(listId)}
+                className={({ isActive }) =>
+                  `${styles.navItem} ${isActive ? styles.navItemActive : ''}`
+                }
+              >
+                <ListIcon />
+                İtem Listesi
+              </NavLink>
+              <NavLink
+                to={ROUTES.REPORTS_WITH_ID(listId)}
+                className={({ isActive }) =>
+                  `${styles.navItem} ${isActive ? styles.navItemActive : ''}`
+                }
+              >
+                <ChartIcon />
+                Raporlar
+              </NavLink>
+              <NavLink
+                to={ROUTES.MEMBERS_WITH_ID(listId)}
+                className={({ isActive }) =>
+                  `${styles.navItem} ${isActive ? styles.navItemActive : ''}`
+                }
+              >
+                <UsersIcon />
+                Üyeler
+              </NavLink>
+            </div>
           </>
         ) : (
           <NavLink

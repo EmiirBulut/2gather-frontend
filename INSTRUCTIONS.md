@@ -705,3 +705,15 @@ Her sayfa doğru layout içinde:
 **Değişen dosyalar:**
 - `src/features/lists/components/CreateListModal.module.css` — tüm Material Design 3 değişkenleri projenin kendi token'larıyla (`--color-bg-card`, `--radius-lg`, `--color-text-primary`, `--color-text-secondary`, `--color-bg-tag`, `--text-lg`) değiştirildi; `--shadow-ambient` yerine sabit `0 4px 24px rgba(0,0,0,0.12)` eklendi
 - `src/components/ui/Input.module.css` — label rengi `--color-text-secondary` olarak güncellendi, `text-transform: uppercase` ve `letter-spacing: 0.08em` eklendi
+
+### BF-7 — Sidebar: plan içindeyken user dashboard'a dönüş yolu yok (2026-04-23)
+
+**Sorun:** Kullanıcı bir plana girdikten sonra user dashboard'a (`/lists`) dönmek için tarayıcı geri tuşu dışında yol yoktu. Mobilde bu tamamen imkânsız hale geliyordu.
+
+**Çözüm:** Sidebar'a plan adı + geri ok eklendi. Nav item'lar `.planNav` wrapper ile görsel hiyerarşi kazandı (border-left + girinti).
+
+**Plan adı stratejisi:** `useQuery(QUERY_KEYS.LIST_DETAIL)` — `ListDetailPage` zaten aynı key'i kullanıyor, o sayfadayken cache hit, diğer sayfalarda (cold start) 1 API çağrısı yapılıp cache'e ekleniyor. Yüklenirken kısa pulse animasyonlu skeleton gösteriliyor.
+
+**Değişen dosyalar:**
+- `src/components/layout/Sidebar.tsx` — `BackIcon`, `useQuery`/`getListDetail`, `useNavigate` eklendi; back link + `.planNav` wrapper ile yeni yapı
+- `src/components/layout/Sidebar.module.css` — `.backLink`, `.backLinkName`, `.backLinkSkeleton`, `.planNav` stilleri eklendi; `var(--transition-fast)` → `150ms ease`, `var(--radius-full)` → `50%` pre-existing fix'leri uygulandı
