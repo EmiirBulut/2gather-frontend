@@ -78,7 +78,7 @@ const NewItemPage = () => {
       { listId, categoryId: data.categoryId, name: data.name },
       {
         onSuccess: (item) => {
-          const hasOption = data.store || (data.link && data.link !== '') || (data.price && data.price !== '')
+          const hasOption = data.store || (data.link && data.link !== '') || !!data.price
           if (hasOption) {
             setCreatedItemId(item.id)
             createOption(

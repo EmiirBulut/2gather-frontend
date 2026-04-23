@@ -23,7 +23,7 @@ interface Props {
 }
 
 const InviteMemberModal = ({ listId, onClose }: Props) => {
-  const { mutate, isPending, isSuccess, error } = useInviteMember()
+  const { mutate, isPending, isSuccess, error } = useInviteMember(listId)
 
   const {
     register,
@@ -36,7 +36,7 @@ const InviteMemberModal = ({ listId, onClose }: Props) => {
 
   const handleInvite = (data: InviteFormData) => {
     mutate(
-      { listId, data },
+      data,
       { onSuccess: () => setTimeout(onClose, 1200) }
     )
   }

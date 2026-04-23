@@ -38,12 +38,12 @@ export function usePermission(listId: string): Permission {
     return { canEdit: isOwner || me.role === 'Editor', canManageMembers: isOwner, isOwner }
   }
 
-  // 3. Lists summary cache — check ownerId only
+  // 3. Lists summary cache — check currentUserRole
   const lists = queryClient.getQueryData<ListSummaryDto[]>(QUERY_KEYS.LISTS)
   const list = lists?.find((l) => l.id === listId)
   if (list) {
-    const isOwner = list.ownerId === user.id
-    return { canEdit: isOwner, canManageMembers: isOwner, isOwner }
+    const isOwner = list.currentUserRole === 0
+    return { canEdit: isOwner || list.currentUserRole === 1, canManageMembers: isOwner, isOwner }
   }
 
   // 4. Default: grant edit until role is determined
