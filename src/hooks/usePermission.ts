@@ -29,13 +29,11 @@ export function usePermission(listId: string): Permission {
     return { canEdit: isOwner || me.role === 'Editor', canManageMembers: isOwner, isOwner }
   }
 
-  // 2. List detail cache — GET /api/lists/:id embeds members array
+  // 2. List detail cache — currentUserRole tells us the current user's role directly
   const listDetail = queryClient.getQueryData<ListDetailNormalized>(QUERY_KEYS.LIST_DETAIL(listId))
-  if (listDetail?.members) {
-    const me = listDetail.members.find((m) => m.userId === user.id)
-    if (!me) return { canEdit: false, canManageMembers: false, isOwner: false }
-    const isOwner = me.role === 'Owner'
-    return { canEdit: isOwner || me.role === 'Editor', canManageMembers: isOwner, isOwner }
+  if (listDetail !== undefined) {
+    const isOwner = listDetail.currentUserRole === 0
+    return { canEdit: isOwner || listDetail.currentUserRole === 1, canManageMembers: isOwner, isOwner }
   }
 
   // 3. Lists summary cache — check currentUserRole

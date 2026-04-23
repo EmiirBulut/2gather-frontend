@@ -718,6 +718,33 @@ Her sayfa doğru layout içinde:
 - `src/components/layout/Sidebar.tsx` — `BackIcon`, `useQuery`/`getListDetail`, `useNavigate` eklendi; back link + `.planNav` wrapper ile yeni yapı
 - `src/components/layout/Sidebar.module.css` — `.backLink`, `.backLinkName`, `.backLinkSkeleton`, `.planNav` stilleri eklendi; `var(--transition-fast)` → `150ms ease`, `var(--radius-full)` → `50%` pre-existing fix'leri uygulandı
 
+### BF-9 — ListDetailPage Finansal Özet `₺ —` gösteriyor (2026-04-23)
+
+**Sorun:** `ListDetailPage.tsx` içinde "Tahmini Toplam Bütçe" ve "Harcanan Toplam" değerleri `₺ —` sabit değerleri gösteriyordu. `useListDetail` hook'u `listDetail.financial.totalEstimated` ve `listDetail.financial.totalSpent` alanlarını doğru döndürüyordu ancak bu veriler hiç kullanılmıyordu.
+
+**Kök neden:** `ListDetailDto` frontend tipi yanlıştı — `ownerId`, `members` gibi alanlar vardı ama backend `financial`, `completionPercentage`, `categorySummaries`, `pendingClaims`, `memberCount` gibi farklı alanlar dönüyordu. Tip uyuşmazlığı nedeniyle TypeScript bu alanları bilmiyordu ve kullanılamıyordu.
+
+**Değişen dosyalar:**
+- `src/features/lists/types/index.ts` — `ListDetailDto` ve `ListDetailNormalized` tamamen yeniden yazıldı; backend'in gerçek yanıtıyla (`financial`, `completionPercentage`, `pendingClaims`, `categorySummaries`, `memberCount`, `currentUserRole`) eşleştirildi. `FinancialSummaryDto`, `PendingClaimSummaryDto`, `CategorySummaryDto` arayüzleri eklendi. `BackendMemberDto` / `MemberDto` imports kaldırıldı.
+- `src/features/lists/api/listsApi.ts` — `normalizeListDetail` kaldırıldı (normalize edilecek üye yoktu), `ROLE_MAP` ve ilgili import'lar kaldırıldı. `getListDetail` direkt `response.data` döndürüyor.
+- `src/pages/ListDetailPage.tsx` — `formatPrice` import edildi; `₺ —` sabit değerleri `formatPrice(listDetail?.financial?.totalEstimated)` ve `formatPrice(listDetail?.financial?.totalSpent)` ile değiştirildi.
+
+### BF-10 — Sidebar'da çıkış butonu yok; Üyeler sayfası member listesi göstermiyor (2026-04-23)
+
+**Sorun 1 (Logout):** Uygulamada hiçbir yerde oturumu kapatma butonu yoktu.
+
+**Sorun 2 (Üyeler sayfası):** `MembersPage.tsx` üye listesini `listDetail?.members` üzerinden okuyordu. Backend `GET /api/lists/:id` yanıtı artık `members` dizisi içermediğinden sayfa boş kalıyordu. Ayrıca backend'de `GET /api/lists/:id/members` endpoint'i yoktu.
+
+**Çözümler:**
+- Backend: `GET /api/lists/{listId}/members` endpoint'i eklendi (`GetMembersQuery`, `GetMembersQueryHandler`, `IListRepository.GetMembersByListIdAsync`, `ListRepository` implementasyonu)
+- Frontend `usePermission.ts`: `listDetail?.members` arama döngüsü kaldırıldı; `listDetail.currentUserRole` direkt kullanılıyor
+- Frontend `membersApi.ts`: `getMembers(listId)` fonksiyonu eklendi (role normalizasyonu dahil)
+- Frontend `useMembers.ts`: Artık `useListDetail` alias değil; `QUERY_KEYS.MEMBERS` kullanarak gerçek endpoint'e bağlanıyor
+- Frontend `MembersPage.tsx`: `useMembers(listId)` hook'u kullanılıyor, `listDetail?.members` referansları kaldırıldı
+- Frontend `authStore.ts`: `logout()` aksiyonu eklendi — TanStack Query cache temizliği + `refresh-token` sessionStorage'dan silme + Zustand state sıfırlama
+- `Sidebar.tsx`: `LogoutIcon` + "Çıkış Yap" butonu Ayarlar'ın altına eklendi; tıklanınca `logout()` çağrılıp `/login`'e yönlendiriliyor
+- `Sidebar.module.css`: `.logoutItem` stili eklendi
+
 ### BF-8 — Sidebar plan adı gelmiyor + `normalizeListDetail` crash (2026-04-23)
 
 **Sorun 1:** `normalizeListDetail` içinde `raw.members.map(...)` çağrısı yapılıyordu. Backend `GET /api/lists/{id}` yanıtında `members` dizisi bulunmadığı için `raw.members` → `undefined` → runtime crash. Bu nedenle `useListDetail` her zaman hata durumuna düşüyor, `listDetail` her yerde `undefined` kalıyordu. Sidebar'da plan adı hiç gelmiyordu; `ListDetailPage`'de başlık da `—` olarak görünüyordu.

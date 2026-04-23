@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useListDetail } from '@/features/lists/hooks/useListDetail'
+import { useMembers } from '@/features/members/hooks/useMembers'
 import { usePermission } from '@/hooks/usePermission'
 import { Breadcrumb } from '@/components/layout/Breadcrumb'
 import InvitePanel from '@/features/members/components/InvitePanel'
@@ -27,7 +28,8 @@ const MembersPage = () => {
   const { listId } = useParams<{ listId: string }>()
   const navigate = useNavigate()
 
-  const { data: listDetail, isLoading, isError } = useListDetail(listId ?? '')
+  const { data: listDetail } = useListDetail(listId ?? '')
+  const { data: members, isLoading, isError } = useMembers(listId ?? '')
   const { canManageMembers, isOwner } = usePermission(listId ?? '')
 
   if (!listId) {
@@ -69,7 +71,7 @@ const MembersPage = () => {
 
             {!isLoading && !isError && (
               <div className={styles.memberList}>
-                {listDetail?.members.map((member) => (
+                {members?.map((member) => (
                   <div key={member.userId} className={styles.memberRow}>
                     <div className={styles.avatar}>{initials(member.displayName)}</div>
                     <div className={styles.memberInfo}>
@@ -81,7 +83,7 @@ const MembersPage = () => {
                     </span>
                   </div>
                 ))}
-                {listDetail?.members.length === 0 && (
+                {members?.length === 0 && (
                   <p className={styles.emptyText}>Henüz üye yok.</p>
                 )}
               </div>

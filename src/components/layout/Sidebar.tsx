@@ -46,10 +46,19 @@ const SettingsIcon = () => (
   </svg>
 )
 
+const LogoutIcon = () => (
+  <svg className={styles.navIcon} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+    <path d="M10.5 11L13.5 8l-3-3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M13.5 8H6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+  </svg>
+)
+
 export const Sidebar = () => {
   const { listId } = useParams<{ listId: string }>()
   const navigate = useNavigate()
   const user = useAuthStore((s) => s.user)
+  const logout = useAuthStore((s) => s.logout)
 
   const { data: listDetail } = useQuery({
     queryKey: QUERY_KEYS.LIST_DETAIL(listId!),
@@ -60,6 +69,11 @@ export const Sidebar = () => {
   const initials = user?.displayName
     ? user.displayName.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()
     : '?'
+
+  function handleLogout() {
+    logout()
+    navigate(ROUTES.LOGIN)
+  }
 
   return (
     <aside className={styles.sidebar}>
@@ -141,6 +155,10 @@ export const Sidebar = () => {
           <SettingsIcon />
           Ayarlar
         </a>
+        <button className={styles.logoutItem} onClick={handleLogout}>
+          <LogoutIcon />
+          Çıkış Yap
+        </button>
         <div className={styles.user}>
           <div className={styles.avatar}>{initials}</div>
           <div className={styles.userInfo}>

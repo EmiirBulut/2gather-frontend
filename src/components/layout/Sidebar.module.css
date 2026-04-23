@@ -155,6 +155,28 @@
   color: var(--color-text-primary);
 }
 
+.logoutItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+
+.logoutItem:hover {
+  background: var(--color-bg-tag);
+  color: var(--color-text-primary);
+}
+
 .user {
   display: flex;
   align-items: center;
