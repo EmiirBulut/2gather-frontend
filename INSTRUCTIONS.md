@@ -653,3 +653,40 @@ Her sayfa doğru layout içinde:
 6. `usePermission` hook'unu edit/delete kontrolleri için kullan.
 7. Modal'dan sayfaya taşınan bileşenlerde eski modal kodunu temizle.
 8. `ListSelectorPage` TopNavLayout, diğerleri AppLayout.
+9. Mail gönderimi için frontend'de hiçbir Resend bağımlılığı ekleme — tüm mail işlemi backend'de.
+
+---
+
+## Bug Fixes
+
+### BF-1 — List Selector: sahip olunan planlar "Davet Edildiğim" altında görünüyor (2026-04-23)
+
+**Sorun:** `ListSummaryDto` frontend tipi `ownerId: string` olarak tanımlıydı ama backend bu alanı göndermiyordu; backend `currentUserRole: number` (0=Owner, 1=Editor, 2=Viewer) gönderiyordu. `ListSelectorPage.tsx` `l.ownerId === user.id` karşılaştırması yaptığından `ownerId` her zaman `undefined` kalıyor, tüm listeler "davet edildi" sepetine düşüyordu.
+
+**Değişen dosyalar:**
+- `src/features/lists/types/index.ts` — `ListSummaryDto`'dan `ownerId` kaldırıldı, `currentUserRole: number` ve backend'in gönderdiği diğer alanlar eklendi (`totalItemCount`, `purchasedItemCount`, `pendingItemCount`, `completionPercentage`, `members`)
+- `src/pages/ListSelectorPage.tsx` — filtre `l.currentUserRole === 0` ile güncellendi
+- `src/hooks/usePermission.ts` — lists cache fallback da `currentUserRole === 0` kullanacak şekilde güncellendi; Editor rolü (1) için `canEdit: true` eklendi
+
+### BF-2 — List Selector: farklı kullanıcı girişinde önceki kullanıcının listeleri anlık görünüyor (2026-04-23)
+
+**Sorun:** TanStack Query cache logout sırasında temizlenmiyordu. A kullanıcısının listeleri cache'te kalıyor, B kullanıcısı giriş yapınca `staleTime` süresi dolmamışsa bu cache anlık olarak render ediliyordu.
+
+**Değişen dosyalar:**
+- `src/lib/queryClient.ts` — `QueryClient` instance'ı `main.tsx`'den bu dosyaya taşındı (böylece `api.ts` de import edebilir)
+- `src/main.tsx` — local `QueryClient` kaldırıldı, `@/lib/queryClient` import'u eklendi
+- `src/services/api.ts` — `clearSession()` fonksiyonuna `queryClient.clear()` eklendi; 401 veya logout sırasında tüm cache temizleniyor
+
+### BF-3 — NewItemPage: `price !== ''` TypeScript karşılaştırma hatası (2026-04-23)
+
+**Sorun:** `z.coerce.number()` ile tanımlanan `price` alanı TypeScript'te `number` olarak çözümleniyor, `data.price !== ''` karşılaştırması tip hatası üretiyordu.
+
+**Değişen dosyalar:**
+- `src/pages/NewItemPage.tsx` — karşılaştırma `!!data.price` ile basitleştirildi
+
+### BF-4 — InviteMemberModal: eski hook API'sine uyumsuzluk (2026-04-23)
+
+**Sorun:** `useInviteMember()` hook'u artık `listId: string` argümanı gerektiriyor ama modal argümansız çağırıyordu. Modal hiçbir yerde kullanılmıyor (dead code), ancak TypeScript build hatasına yol açıyordu.
+
+**Değişen dosyalar:**
+- `src/features/members/components/InviteMemberModal.tsx` — `useInviteMember(listId)` ve `mutate(data)` olarak güncellendi

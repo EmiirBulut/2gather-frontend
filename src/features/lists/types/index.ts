@@ -5,9 +5,20 @@ import type { BackendMemberDto, MemberDto } from '@/features/members/types'
 export interface ListSummaryDto {
   id: string
   name: string
-  ownerId: string
+  currentUserRole: number  // 0=Owner, 1=Editor, 2=Viewer
   memberCount: number
+  totalItemCount: number
+  purchasedItemCount: number
+  pendingItemCount: number
+  completionPercentage: number
+  members: MemberAvatarDto[]
   createdAt: string
+}
+
+export interface MemberAvatarDto {
+  userId: string
+  displayName: string
+  initials: string
 }
 
 // GET /api/lists/:id returns full detail with embedded members

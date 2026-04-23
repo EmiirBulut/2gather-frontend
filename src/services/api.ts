@@ -1,4 +1,5 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios'
+import { queryClient } from '@/lib/queryClient'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -55,6 +56,7 @@ function setTokens(accessToken: string, refreshToken: string): void {
 function clearSession(): void {
   sessionStorage.removeItem('auth-storage')
   sessionStorage.removeItem('refresh-token')
+  queryClient.clear()
 }
 
 // ─── Request Interceptor — Attach JWT ─────────────────────────────────────────

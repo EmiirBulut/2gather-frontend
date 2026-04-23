@@ -21,8 +21,8 @@ const ListSelectorPage = () => {
     },
   })
 
-  const ownedLists = lists?.filter((l) => l.ownerId === user?.id) ?? []
-  const invitedLists = lists?.filter((l) => l.ownerId !== user?.id) ?? []
+  const ownedLists = lists?.filter((l) => l.currentUserRole === 0) ?? []
+  const invitedLists = lists?.filter((l) => l.currentUserRole !== 0) ?? []
   const firstName = user?.displayName?.split(' ')[0] ?? 'Hoş geldin'
 
   return (
