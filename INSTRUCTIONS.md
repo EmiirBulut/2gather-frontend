@@ -697,3 +697,11 @@ Her sayfa doğru layout içinde:
 
 **Değişen dosyalar:**
 - `src/features/lists/components/ListCard.tsx` — `purchasedItemCount/totalItemCount öğe`, `%completionPercentage`, progress bar genişliği ve avatar initials gerçek DTO alanlarından okunacak şekilde güncellendi. Rol badge'i de `currentUserRole`'dan dinamik üretiliyor.
+
+### BF-6 — CreateListModal: modal arka planı transparan, başlık ve input görünmüyor (2026-04-23)
+
+**Sorun:** `CreateListModal.module.css` Material Design 3 CSS değişken adları kullanıyordu (`--color-surface-container-lowest`, `--radius-xl`, `--shadow-ambient`, `--text-headline-md`, `--color-on-surface`, `--color-on-surface-variant`, `--color-surface-container-highest`, `--transition-fast`). Bu değişkenler projenin design token sisteminde tanımlı olmadığından undefined kalıyor, modal arka planı transparan düşüyordu. Sonuç olarak başlık, input ve butonlar blurlanmış sayfa zemini üzerinde okunaksız hale geliyordu. `Input.module.css` label rengi de `--color-text-muted` (#9B9B9B) ile yetersiz kontrasttaydı ve `uppercase`/`letter-spacing` eksikti.
+
+**Değişen dosyalar:**
+- `src/features/lists/components/CreateListModal.module.css` — tüm Material Design 3 değişkenleri projenin kendi token'larıyla (`--color-bg-card`, `--radius-lg`, `--color-text-primary`, `--color-text-secondary`, `--color-bg-tag`, `--text-lg`) değiştirildi; `--shadow-ambient` yerine sabit `0 4px 24px rgba(0,0,0,0.12)` eklendi
+- `src/components/ui/Input.module.css` — label rengi `--color-text-secondary` olarak güncellendi, `text-transform: uppercase` ve `letter-spacing: 0.08em` eklendi
