@@ -717,3 +717,13 @@ Her sayfa doğru layout içinde:
 **Değişen dosyalar:**
 - `src/components/layout/Sidebar.tsx` — `BackIcon`, `useQuery`/`getListDetail`, `useNavigate` eklendi; back link + `.planNav` wrapper ile yeni yapı
 - `src/components/layout/Sidebar.module.css` — `.backLink`, `.backLinkName`, `.backLinkSkeleton`, `.planNav` stilleri eklendi; `var(--transition-fast)` → `150ms ease`, `var(--radius-full)` → `50%` pre-existing fix'leri uygulandı
+
+### BF-8 — Sidebar plan adı gelmiyor + `normalizeListDetail` crash (2026-04-23)
+
+**Sorun 1:** `normalizeListDetail` içinde `raw.members.map(...)` çağrısı yapılıyordu. Backend `GET /api/lists/{id}` yanıtında `members` dizisi bulunmadığı için `raw.members` → `undefined` → runtime crash. Bu nedenle `useListDetail` her zaman hata durumuna düşüyor, `listDetail` her yerde `undefined` kalıyordu. Sidebar'da plan adı hiç gelmiyordu; `ListDetailPage`'de başlık da `—` olarak görünüyordu.
+
+**Sorun 2:** `.planNav` wrapper'ına `border-left` eklenmişti, görsel olarak iyi durmadı.
+
+**Değişen dosyalar:**
+- `src/features/lists/api/listsApi.ts` — `raw.members.map(...)` → `(raw.members ?? []).map(...)` ile crash önlendi
+- `src/components/layout/Sidebar.module.css` — `.planNav`'dan `border-left` kaldırıldı, sadece `padding-left: 8px` ile girinti korundu

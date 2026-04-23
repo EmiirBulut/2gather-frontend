@@ -13,7 +13,7 @@ const ROLE_MAP: Record<BackendMemberRole, MemberRole> = {
 function normalizeListDetail(raw: ListDetailDto): ListDetailNormalized {
   return {
     ...raw,
-    members: raw.members.map((m) => ({
+    members: (raw.members ?? []).map((m) => ({
       ...m,
       role: ROLE_MAP[m.role],
     })),

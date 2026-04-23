@@ -85,14 +85,12 @@
   50%       { opacity: 0.4; }
 }
 
-/* Plan alt sayfaları — border-left ile hiyerarşi */
+/* Plan alt sayfaları — girinti ile hiyerarşi */
 .planNav {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  margin-left: 12px;
-  padding-left: 10px;
-  border-left: 2px solid var(--color-border);
+  padding-left: 8px;
 }
 
 .navItem {
