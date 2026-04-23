@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
+import { queryClient } from '@/lib/queryClient'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -14,6 +15,7 @@ interface AuthState {
   user: UserDto | null
   setAuth: (token: string, user: UserDto) => void
   clearAuth: () => void
+  logout: () => void
 }
 
 // ─── Store ────────────────────────────────────────────────────────────────────
@@ -27,6 +29,12 @@ export const useAuthStore = create<AuthState>()(
       setAuth: (token, user) => set({ accessToken: token, user }),
 
       clearAuth: () => set({ accessToken: null, user: null }),
+
+      logout: () => {
+        queryClient.clear()
+        sessionStorage.removeItem('refresh-token')
+        set({ accessToken: null, user: null })
+      },
     }),
     {
       name: 'auth-storage',

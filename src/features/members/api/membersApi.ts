@@ -1,5 +1,5 @@
 import { apiClient } from '@/services/api'
-import type { InviteMemberRequest, PendingInviteDto } from '../types'
+import type { BackendMemberDto, BackendMemberRole, InviteMemberRequest, MemberDto, MemberRole, PendingInviteDto } from '../types'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -10,7 +10,18 @@ export interface InviteResponse {
   expiresAt: string
 }
 
+const ROLE_MAP: Record<BackendMemberRole, MemberRole> = {
+  0: 'Owner',
+  1: 'Editor',
+  2: 'Viewer',
+}
+
 // ─── Members API Functions ────────────────────────────────────────────────────
+
+export async function getMembers(listId: string): Promise<MemberDto[]> {
+  const response = await apiClient.get<BackendMemberDto[]>(`/api/lists/${listId}/members`)
+  return response.data.map((m) => ({ ...m, role: ROLE_MAP[m.role] }))
+}
 
 export async function inviteMember(
   listId: string,

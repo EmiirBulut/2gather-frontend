@@ -1,6 +1,10 @@
 // ─── Lists Feature Types ──────────────────────────────────────────────────────
 
-import type { BackendMemberDto, MemberDto } from '@/features/members/types'
+export interface MemberAvatarDto {
+  userId: string
+  displayName: string
+  initials: string
+}
 
 export interface ListSummaryDto {
   id: string
@@ -15,29 +19,47 @@ export interface ListSummaryDto {
   createdAt: string
 }
 
-export interface MemberAvatarDto {
-  userId: string
-  displayName: string
-  initials: string
+export interface FinancialSummaryDto {
+  totalEstimated: number
+  totalSpent: number
+  remainingBudget: number
 }
 
-// GET /api/lists/:id returns full detail with embedded members
+export interface PendingClaimSummaryDto {
+  claimId: string
+  itemId: string
+  itemName: string
+  optionTitle: string
+  claimantDisplayName: string
+  percentage: number
+  createdAt: string
+}
+
+export interface CategorySummaryDto {
+  categoryId: string
+  name: string
+  roomLabel: string
+  totalItems: number
+  purchasedItems: number
+  completionPercentage: number
+  assignedMembers: MemberAvatarDto[]
+}
+
+// GET /api/lists/:id — full list detail
 export interface ListDetailDto {
   id: string
   name: string
-  ownerId: string
+  currentUserRole: number  // 0=Owner, 1=Editor, 2=Viewer
+  completionPercentage: number
+  financial: FinancialSummaryDto
+  pendingClaims: PendingClaimSummaryDto[]
+  categorySummaries: CategorySummaryDto[]
+  memberCount: number
   createdAt: string
-  members: BackendMemberDto[]
 }
 
-// Normalized list detail with string roles
-export interface ListDetailNormalized {
-  id: string
-  name: string
-  ownerId: string
-  createdAt: string
-  members: MemberDto[]
-}
+// No role normalization needed — members are not included in list detail
+export type ListDetailNormalized = ListDetailDto
 
 export interface CreateListRequest {
   name: string

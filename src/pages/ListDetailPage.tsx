@@ -6,6 +6,7 @@ import { useCategories } from '@/features/categories/hooks/useCategories'
 import { useListStore } from '@/store/listStore'
 import { useSignalR } from '@/hooks/useSignalR'
 import { ROUTES } from '@/router/routes'
+import { formatPrice } from '@/lib/formatters'
 import styles from './ListDetailPage.module.css'
 
 const CATEGORY_ICONS: Record<string, { icon: string; bg: string }> = {
@@ -94,10 +95,10 @@ const ListDetailPage = () => {
           </div>
           <h2 className={styles.financialTitle}>Tahmini Toplam Bütçe</h2>
           <p className={styles.financialSub}>Toplam Hedef</p>
-          <div className={styles.bigNumber}>₺ —</div>
+          <div className={styles.bigNumber}>{formatPrice(listDetail?.financial?.totalEstimated)}</div>
           <div className={styles.financialInner}>
             <span className={styles.financialInnerLabel}>Harcanan Toplam</span>
-            <span className={styles.financialInnerValue}>₺ —</span>
+            <span className={styles.financialInnerValue}>{formatPrice(listDetail?.financial?.totalSpent)}</span>
           </div>
         </div>
 
