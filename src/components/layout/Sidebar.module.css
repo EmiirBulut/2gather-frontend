@@ -39,6 +39,62 @@
   gap: 2px;
 }
 
+/* Back link — plan adı + geri ok */
+.backLink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  text-align: left;
+  transition: background 150ms ease, color 150ms ease;
+  margin-bottom: 4px;
+}
+
+.backLink:hover {
+  background: var(--color-bg-tag);
+  color: var(--color-text-secondary);
+}
+
+.backLinkName {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.backLinkSkeleton {
+  flex: 1;
+  height: 10px;
+  width: 60px;
+  border-radius: var(--radius-sm);
+  background: var(--color-border);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/* Plan alt sayfaları — border-left ile hiyerarşi */
+.planNav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-left: 12px;
+  padding-left: 10px;
+  border-left: 2px solid var(--color-border);
+}
+
 .navItem {
   display: flex;
   align-items: center;
@@ -49,7 +105,7 @@
   font-weight: 500;
   color: var(--color-text-secondary);
   cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast);
+  transition: background 150ms ease, color 150ms ease;
   text-decoration: none;
 }
 
@@ -112,7 +168,7 @@
 .avatar {
   width: 32px;
   height: 32px;
-  border-radius: var(--radius-full);
+  border-radius: 50%;
   background: var(--color-primary-light);
   display: flex;
   align-items: center;
