@@ -19,21 +19,20 @@ const ListCard = ({ list, isOwner, onDelete }: Props) => {
     onDelete(list.id)
   }
 
-  const avatarCount = Math.min(list.memberCount, 3)
+  const roleLabel = list.currentUserRole === 0 ? 'SAHİP' : list.currentUserRole === 1 ? 'EDİTÖR' : 'İZLEYİCİ'
+  const roleBadgeClass = list.currentUserRole === 0 ? styles.roleBadgeOwner : styles.roleBadgeEditor
+
+  const progressPct = Math.round(list.completionPercentage)
+  const itemLabel = `${list.purchasedItemCount}/${list.totalItemCount} öğe`
 
   if (!isOwner) {
     return (
       <div className={styles.card}>
         <div className={styles.cardTop}>
-          <span className={`${styles.roleBadge} ${styles.roleBadgeEditor}`}>EDİTÖR</span>
+          <span className={`${styles.roleBadge} ${roleBadgeClass}`}>{roleLabel}</span>
         </div>
 
         <h3 className={styles.cardName}>{list.name}</h3>
-
-        <div className={styles.ownerRow}>
-          <div className={styles.ownerAvatar}>S</div>
-          <span className={styles.ownerLabel}>Sahibi: —</span>
-        </div>
 
         <div className={styles.invitedStats}>
           <span className={styles.invitedStat}>
@@ -42,17 +41,17 @@ const ListCard = ({ list, isOwner, onDelete }: Props) => {
           </span>
           <span className={styles.invitedStat}>
             <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="2" width="11" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.2"/><path d="M4 6h5M4 8.5h3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/></svg>
-            — öğe
+            {itemLabel}
           </span>
         </div>
 
         <div className={styles.progressSection}>
           <div className={styles.progressHeader}>
             <span className={styles.progressLabel}>İLERLEME</span>
-            <span className={styles.progressPct}>—%</span>
+            <span className={styles.progressPct}>%{progressPct}</span>
           </div>
           <div className={styles.progressBar}>
-            <div className={styles.progressFill} style={{ width: '0%' }} />
+            <div className={styles.progressFill} style={{ width: `${progressPct}%` }} />
           </div>
         </div>
 
@@ -70,7 +69,7 @@ const ListCard = ({ list, isOwner, onDelete }: Props) => {
       onKeyDown={(e) => e.key === 'Enter' && handleClick()}
     >
       <div className={styles.cardTop}>
-        <span className={`${styles.roleBadge} ${styles.roleBadgeOwner}`}>SAHİP</span>
+        <span className={`${styles.roleBadge} ${roleBadgeClass}`}>{roleLabel}</span>
         <button
           className={styles.menuBtn}
           onClick={handleDelete}
@@ -86,9 +85,9 @@ const ListCard = ({ list, isOwner, onDelete }: Props) => {
         <div className={styles.metaBox}>
           <div className={styles.metaLabel}>ÜYELER</div>
           <div className={styles.avatarStack}>
-            {Array.from({ length: avatarCount }).map((_, i) => (
-              <div key={i} className={styles.avatar}>
-                {String.fromCharCode(65 + i)}
+            {list.members.map((m) => (
+              <div key={m.userId} className={styles.avatar} title={m.displayName}>
+                {m.initials}
               </div>
             ))}
             {list.memberCount > 3 && (
@@ -98,17 +97,17 @@ const ListCard = ({ list, isOwner, onDelete }: Props) => {
         </div>
         <div className={styles.metaBox}>
           <div className={styles.metaLabel}>İLERLEME</div>
-          <div className={styles.metaValue}>— öğe</div>
+          <div className={styles.metaValue}>{itemLabel}</div>
         </div>
       </div>
 
       <div className={styles.progressSection}>
         <div className={styles.progressHeader}>
           <span className={styles.progressLabel}>TAMAMLANMA</span>
-          <span className={styles.progressPct}>—%</span>
+          <span className={styles.progressPct}>%{progressPct}</span>
         </div>
         <div className={styles.progressBar}>
-          <div className={styles.progressFill} style={{ width: '0%' }} />
+          <div className={styles.progressFill} style={{ width: `${progressPct}%` }} />
         </div>
       </div>
     </div>

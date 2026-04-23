@@ -690,3 +690,10 @@ Her sayfa doğru layout içinde:
 
 **Değişen dosyalar:**
 - `src/features/members/components/InviteMemberModal.tsx` — `useInviteMember(listId)` ve `mutate(data)` olarak güncellendi
+
+### BF-5 — ListCard: item sayısı, tamamlanma yüzdesi ve progress bar hardcode placeholder gösteriyordu (2026-04-23)
+
+**Sorun:** `ListCard.tsx` içinde `— öğe`, `—%`, `width: '0%'` sabit değerleri kullanılıyordu. Backend `totalItemCount`, `purchasedItemCount`, `completionPercentage`, `members[]` alanlarını doğru döndürüyordu ama bileşen bunları hiç kullanmıyordu. Avatar stack'i de `String.fromCharCode` ile sahte harfler üretiyordu.
+
+**Değişen dosyalar:**
+- `src/features/lists/components/ListCard.tsx` — `purchasedItemCount/totalItemCount öğe`, `%completionPercentage`, progress bar genişliği ve avatar initials gerçek DTO alanlarından okunacak şekilde güncellendi. Rol badge'i de `currentUserRole`'dan dinamik üretiliyor.
