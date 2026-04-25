@@ -1,8 +1,9 @@
 import { useState, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import PriceInput from '@/components/ui/PriceInput'
 import { useCreateItem } from '@/features/items/hooks/useCreateItem'
 import { useCreateOption } from '@/features/options/hooks/useCreateOption'
 import { useCategories } from '@/features/categories/hooks/useCategories'
@@ -16,7 +17,7 @@ const schema = z.object({
   categoryId: z.string().min(1, 'Kategori seçimi zorunludur'),
   store: z.string().optional(),
   link: z.string().url('Geçerli bir URL giriniz').optional().or(z.literal('')),
-  price: z.coerce.number().positive('Fiyat pozitif olmalıdır').optional().or(z.literal('')),
+  price: z.number().positive('Fiyat pozitif olmalıdır').optional(),
   currency: z.string().optional(),
 })
 
@@ -46,6 +47,7 @@ const NewItemPage = () => {
   const {
     register,
     handleSubmit,
+    control,
     watch,
     setValue,
     formState: { errors },
@@ -85,7 +87,7 @@ const NewItemPage = () => {
               {
                 itemId: item.id,
                 title: data.store || item.name,
-                price: data.price ? Number(data.price) : undefined,
+                price: data.price,
                 currency: data.currency || 'TRY',
                 link: data.link || undefined,
               },
@@ -185,21 +187,21 @@ const NewItemPage = () => {
                     />
                     {errors.link && <p className={styles.errorText}>{errors.link.message}</p>}
                   </div>
-                  <div>
-                    <label className={styles.optionFieldLabel}>Fiyat</label>
-                    <div className={styles.priceWrapper}>
-                      <input
-                        {...register('price')}
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        className={styles.optionInput}
+                  <Controller
+                    name="price"
+                    control={control}
+                    render={({ field }) => (
+                      <PriceInput
+                        label="Fiyat"
                         placeholder="0"
+                        value={field.value}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                        errorMessage={errors.price?.message}
+                        suffix="₺"
                       />
-                      <span className={styles.priceSuffix}>₺</span>
-                    </div>
-                    {errors.price && <p className={styles.errorText}>{errors.price.message}</p>}
-                  </div>
+                    )}
+                  />
                 </div>
               </div>
             </div>
