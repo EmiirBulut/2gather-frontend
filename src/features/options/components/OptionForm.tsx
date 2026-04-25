@@ -1,9 +1,10 @@
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
+import PriceInput from '@/components/ui/PriceInput'
 import type { ItemOptionDto } from '../types'
 import styles from './OptionForm.module.css'
 
@@ -11,11 +12,7 @@ import styles from './OptionForm.module.css'
 
 const optionSchema = z.object({
   title: z.string().min(2, 'Başlık en az 2 karakter olmalı').max(120),
-  price: z
-    .string()
-    .optional()
-    .transform((v) => (v && v.trim() !== '' ? parseFloat(v) : undefined))
-    .pipe(z.number().positive('Fiyat pozitif olmalı').optional()),
+  price: z.number().positive('Fiyat pozitif olmalı').optional(),
   link: z.string().url('Geçerli bir URL girin').optional().or(z.literal('')),
   notes: z.string().max(500).optional(),
   brand: z.string().max(100).optional(),
@@ -48,13 +45,14 @@ const OptionForm = ({ existing, isPending, error, onSubmit, onCancel }: Props) =
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
     setFocus,
   } = useForm<OptionFormData>({
     resolver: zodResolver(optionSchema),
     defaultValues: {
       title: existing?.title ?? '',
-      price: existing?.price != null ? String(existing.price) as unknown as number : undefined,
+      price: existing?.price ?? undefined,
       link: existing?.link ?? '',
       notes: existing?.notes ?? '',
       brand: existing?.brand ?? '',
@@ -88,12 +86,20 @@ const OptionForm = ({ existing, isPending, error, onSubmit, onCancel }: Props) =
         {...register('title')}
       />
 
-      <Input
-        label="Fiyat"
-        type="number"
-        placeholder="0.00"
-        errorMessage={errors.price?.message}
-        {...register('price')}
+      <Controller
+        name="price"
+        control={control}
+        render={({ field }) => (
+          <PriceInput
+            label="Fiyat"
+            placeholder="0"
+            value={field.value}
+            onChange={field.onChange}
+            onBlur={field.onBlur}
+            errorMessage={errors.price?.message}
+            suffix="₺"
+          />
+        )}
       />
 
       <Input
