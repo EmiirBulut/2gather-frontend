@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useItems } from '@/features/items/hooks/useItems'
 import { useCategories } from '@/features/categories/hooks/useCategories'
 import { useListDetail } from '@/features/lists/hooks/useListDetail'
@@ -45,7 +45,10 @@ const ItemListPage = () => {
   const navigate = useNavigate()
   const setActiveListId = useListStore((s) => s.setActiveListId)
 
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
+  const [searchParams] = useSearchParams()
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
+    searchParams.get('category')
+  )
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false)
 
   if (listId) setActiveListId(listId)
