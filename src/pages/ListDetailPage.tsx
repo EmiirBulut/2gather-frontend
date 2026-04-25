@@ -150,10 +150,10 @@ const ListDetailPage = () => {
               <div
                 key={cat.id}
                 className={styles.categoryCard}
-                onClick={() => navigate(ROUTES.ITEM_LIST_WITH_ID(listId))}
+                onClick={() => navigate(`${ROUTES.ITEM_LIST_WITH_ID(listId)}?category=${cat.id}`)}
                 role="button"
                 tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && navigate(ROUTES.ITEM_LIST_WITH_ID(listId))}
+                onKeyDown={(e) => e.key === 'Enter' && navigate(`${ROUTES.ITEM_LIST_WITH_ID(listId)}?category=${cat.id}`)}
               >
                 <div className={styles.categoryCardTop}>
                   <div className={styles.categoryIcon} style={{ background: bg }}>{icon}</div>
