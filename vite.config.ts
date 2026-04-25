@@ -9,6 +9,9 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  optimizeDeps: {
+    exclude: ['@microsoft/signalr'],
+  },
   server: {
     proxy: {
       '/api': 'http://localhost:5289',
