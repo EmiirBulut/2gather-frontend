@@ -745,6 +745,47 @@ Her sayfa doğru layout içinde:
 - `Sidebar.tsx`: `LogoutIcon` + "Çıkış Yap" butonu Ayarlar'ın altına eklendi; tıklanınca `logout()` çağrılıp `/login`'e yönlendiriliyor
 - `Sidebar.module.css`: `.logoutItem` stili eklendi
 
+### BF-11 — Tahmini Toplam Bütçe ve Harcanan Toplam ₺0 gösteriyor (2026-04-23)
+
+**Sorun:** Backend `GetListDetailAsync` sorgusu `TotalEstimated` ve `TotalSpent` hesaplarken yalnızca `IsSelected=true` olan seçenekleri dikkate alıyordu. `IsFinal=true` olan (sahip tarafından kesinleştirilen) seçenekler sayılmıyordu.
+
+**Kök neden:** `ListRepository.GetListDetailAsync` içindeki LINQ sorgusunda `o.IsSelected` filtresi vardı; `o.IsFinal` dahil edilmemişti.
+
+**Not:** `₺0` görünmesi için itemlerin fiyatlı + seçili/kesinleştirilmiş seçenekleri olması gerekir. Test verilerinde bu koşullar sağlanmıyorsa `₺0` doğru davranıştır.
+
+**Değişen dosyalar:**
+- `src/TwoGather.Infrastructure/Persistence/Repositories/ListRepository.cs` — `TotalEstimated` ve `TotalSpent` filtresi `o.IsSelected` → `(o.IsFinal || o.IsSelected)` olarak genişletildi
+
+### BF-12 — Üyeler sayfası "Üyeler yüklenemedi" hatası (2026-04-23)
+
+**Sorun:** Backend'de `GET /api/lists/{listId}/members` endpoint'i yoktu. Ayrıca EF Core navigation property üzerinden kullanıcı bilgisi yüklenemiyordu.
+
+**Değişen dosyalar (backend):**
+- `IListRepository.cs` — `GetMembersByListIdAsync` metodu eklendi
+- `ListRepository.cs` — Explicit LINQ join ile implementasyon eklendi
+- `GetMembersQuery.cs` ve `GetMembersQueryHandler.cs` — yeni sorgu/handler oluşturuldu
+- `MembersController.cs` — `[HttpGet]` endpoint'i eklendi
+
+**Değişen dosyalar (frontend):**
+- `membersApi.ts` — `getMembers()` fonksiyonu eklendi (role normalizasyonu dahil)
+- `useMembers.ts` — `useListDetail` alias yerine gerçek endpoint çağrısı
+
+### BF-13 — Davet gönderilemedi hatası (2026-04-23)
+
+**Sorun:** `InviteMemberCommandHandler` davet kaydını DB'ye başarıyla ekliyordu; ancak ardından `ResendEmailService.SendInviteAsync` çağrısı (Resend API anahtarı yapılandırılmamış dev ortamında) exception fırlatıyordu ve bu exception handler'dan yukarı iletiliyordu. Frontend 500 aldığında "Davet gönderilemedi" gösteriyordu — oysa davet DB'de zaten oluşmuştu.
+
+**Kök neden:** Email gönderimi başarısız olunca `throw` ile exception'ı yukarı iletiliyordu; davet kaydı başarılı olsa bile tüm işlem hata olarak dönüyordu.
+
+**Değişen dosyalar:**
+- `InviteMemberCommandHandler.cs` — `SendInviteAsync` try-catch içine alındı; email hatası `LogWarning` ile loglanıp yutuldu. Davet oluşturma işlemi email başarısız olsa dahi `200 OK` döner.
+
+### Vite + @microsoft/signalr console uyarıları (2026-04-23)
+
+**Sorun:** Vite'ın dep optimizer, `@microsoft/signalr` paketinin pre-bundled ESM dosyalarını işleyemeyerek her yüklemede "Failed to load optimization result" uyarıları üretiyordu.
+
+**Değişen dosyalar:**
+- `vite.config.ts` — `optimizeDeps: { exclude: ['@microsoft/signalr'] }` eklendi
+
 ### BF-8 — Sidebar plan adı gelmiyor + `normalizeListDetail` crash (2026-04-23)
 
 **Sorun 1:** `normalizeListDetail` içinde `raw.members.map(...)` çağrısı yapılıyordu. Backend `GET /api/lists/{id}` yanıtında `members` dizisi bulunmadığı için `raw.members` → `undefined` → runtime crash. Bu nedenle `useListDetail` her zaman hata durumuna düşüyor, `listDetail` her yerde `undefined` kalıyordu. Sidebar'da plan adı hiç gelmiyordu; `ListDetailPage`'de başlık da `—` olarak görünüyordu.
