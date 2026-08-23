@@ -17,11 +17,11 @@
 }
 
 .modal {
-  background-color: var(--color-surface);
+  background-color: var(--color-bg-card);
   border-radius: var(--radius-lg);
   width: 100%;
   max-width: 400px;
-  box-shadow: var(--shadow-ambient);
+  box-shadow: var(--shadow-md);
   animation: slideUp 200ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 
@@ -39,9 +39,9 @@
 
 .title {
   font-family: var(--font-display);
-  font-size: var(--text-headline-sm);
+  font-size: 22px;
   font-weight: 700;
-  color: var(--color-on-surface);
+  color: var(--color-text-primary);
   letter-spacing: -0.02em;
 }
 
@@ -55,12 +55,12 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--color-on-surface-variant);
+  color: var(--color-text-secondary);
   transition: background-color var(--transition-fast);
 }
 
 .closeBtn:hover {
-  background-color: var(--color-surface-container-highest);
+  background-color: var(--color-bg-tag);
 }
 
 .fields {
@@ -72,8 +72,8 @@
 
 .serverError {
   font-family: var(--font-body);
-  font-size: var(--text-body-sm);
-  color: var(--color-error);
+  font-size: 13px;
+  color: var(--color-danger);
   padding: var(--space-3) var(--space-6) 0;
 }
 
@@ -82,4 +82,98 @@
   justify-content: flex-end;
   gap: var(--space-3);
   padding: var(--space-5) var(--space-6) var(--space-6);
+}
+
+/* ---- Existing categories list ---- */
+
+.categoryList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 0 var(--space-6) var(--space-4);
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.categoryRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-tag);
+}
+
+.categoryRowInfo {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.categoryRowName {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.categoryRowLabel {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.editBtn {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.editBtn:hover {
+  background-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.categoryRowEditing {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-tag);
+}
+
+.categoryRowFields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.categoryRowActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.sectionDivider {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 0 var(--space-6);
 }
