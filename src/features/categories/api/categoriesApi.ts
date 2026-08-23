@@ -18,3 +18,14 @@ export async function createCategory(
   )
   return response.data
 }
+
+export async function updateCategory(
+  categoryId: string,
+  data: CreateCategoryRequest
+): Promise<CategoryDto> {
+  const response = await apiClient.put<CategoryDto>(
+    `/api/categories/${categoryId}`,
+    data
+  )
+  return response.data
+}

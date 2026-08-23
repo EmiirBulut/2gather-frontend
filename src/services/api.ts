@@ -158,11 +158,25 @@ export function normalizeError(error: unknown): ApiError {
   if (error instanceof AxiosError) {
     const status = error.response?.status ?? null
     const data = error.response?.data as
-      | { message?: string; errors?: Record<string, string[]> }
+      | {
+          message?: string
+          title?: string
+          error?: string
+          details?: string[]
+          errors?: Record<string, string[]>
+        }
       | undefined
 
+    const message =
+      data?.message ??
+      data?.error ??
+      (data?.details?.length ? data.details.join(' ') : undefined) ??
+      data?.title ??
+      error.message ??
+      'Beklenmeyen bir hata oluştu'
+
     return {
-      message: data?.message ?? error.message ?? 'Beklenmeyen bir hata oluştu',
+      message,
       statusCode: status,
       errors: data?.errors,
     }

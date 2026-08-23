@@ -1,5 +1,11 @@
 // ─── Lists Feature Types ──────────────────────────────────────────────────────
 
+export enum ListTemplate {
+  Custom = 0,
+  HomeDesign = 1,
+  Wedding = 2,
+}
+
 export interface MemberAvatarDto {
   userId: string
   displayName: string
@@ -63,4 +69,5 @@ export type ListDetailNormalized = ListDetailDto
 
 export interface CreateListRequest {
   name: string
+  template: ListTemplate
 }
