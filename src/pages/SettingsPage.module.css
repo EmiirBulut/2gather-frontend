@@ -1,6 +1,9 @@
+/* Forms read best in a narrow column, so the page is centered in the content area
+   (both in AppLayout and in TopNavLayout) instead of stretching full width */
 .page {
-  max-width: 720px;
+  max-width: 760px;
   width: 100%;
+  margin: 0 auto;
 }
 
 .header {
