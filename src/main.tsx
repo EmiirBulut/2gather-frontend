@@ -5,6 +5,8 @@ import { RouterProvider } from 'react-router-dom'
 import { router } from '@/router'
 import { queryClient } from '@/lib/queryClient'
 import { initTheme } from '@/lib/theme'
+// Captures beforeinstallprompt as early as possible (see usePWAInstall)
+import '@/lib/pwaInstall'
 import '@/assets/styles/globals.css'
 
 initTheme()

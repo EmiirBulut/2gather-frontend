@@ -4,6 +4,7 @@ import { ROUTES } from '@/router/routes'
 import { useAuthStore } from '@/store/authStore'
 import { getListDetail } from '@/features/lists/api/listsApi'
 import { QUERY_KEYS } from '@/lib/queryKeys'
+import InstallAppButton from '@/components/ui/InstallAppButton'
 import styles from './Sidebar.module.css'
 
 const HomeIcon = () => (
@@ -151,6 +152,9 @@ export const Sidebar = () => {
       </nav>
 
       <div className={styles.bottom}>
+        <div className={styles.installSlot}>
+          <InstallAppButton />
+        </div>
         <NavLink
           to={listId ? ROUTES.LIST_SETTINGS_WITH_ID(listId) : ROUTES.SETTINGS}
           className={({ isActive }) =>

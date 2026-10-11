@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { ROUTES } from '@/router/routes'
 import { useAuthStore } from '@/store/authStore'
+import InstallAppButton from '@/components/ui/InstallAppButton'
 import styles from './TopNav.module.css'
 
 export const TopNav = () => {
@@ -28,6 +29,7 @@ export const TopNav = () => {
       </nav>
 
       <div className={styles.right}>
+        <InstallAppButton />
         <button className={styles.bellBtn} aria-label="Bildirimler">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M10 2a6 6 0 00-6 6v3l-1.5 2.5h15L16 11V8a6 6 0 00-6-6z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
