@@ -29,3 +29,7 @@ export async function updateCategory(
   )
   return response.data
 }
+
+export async function deleteCategory(categoryId: string): Promise<void> {
+  await apiClient.delete(`/api/categories/${categoryId}`)
+}

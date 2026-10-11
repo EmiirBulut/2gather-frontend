@@ -177,3 +177,20 @@
   border-top: 1px solid var(--color-border);
   margin: 0 var(--space-6);
 }
+
+.categoryRowButtons {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
+
+.deleteBtn:hover:not(:disabled) {
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+}
+
+.deleteBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

@@ -34,6 +34,11 @@ interface ItemImageUpdatedPayload {
   imageUrl: string
 }
 
+interface CategoryDeletedPayload {
+  listId: string
+  categoryId: string
+}
+
 interface ListUpdatedPayload {
   listId: string
   name: string
@@ -315,6 +320,13 @@ export function useSignalR(): void {
       onEvent<ListUpdatedPayload>('ListUpdated', ({ listId }) => {
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LIST_DETAIL(listId) })
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LISTS, exact: true })
+      })
+    )
+
+    offs.push(
+      onEvent<CategoryDeletedPayload>('CategoryDeleted', ({ listId }) => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CATEGORIES(listId) })
+        invalidateListAggregates(listId)
       })
     )
 
