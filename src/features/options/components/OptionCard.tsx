@@ -30,10 +30,6 @@ const OptionCard = ({ option, canEdit, isOwner, isPurchased }: Props) => {
   const { mutate: handleSetFinal, isPending: isSettingFinal } = useSetFinalOption(option.itemId)
   const { mutate: handleRemoveFinal, isPending: isRemovingFinal } = useRemoveFinalDecision(option.itemId)
 
-  const handleSelectClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (canEdit) handleSelect(option.id)
-  }
 
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -57,6 +53,14 @@ const OptionCard = ({ option, canEdit, isOwner, isPurchased }: Props) => {
   // Purchased items are locked; non-owner cannot edit/delete a finalized option
   const canMutate = canEdit && !isPurchased && !(option.isFinal && !isOwner)
   const canChangeFinalDecision = isOwner && !isPurchased
+  // Purchased items are read-only: no selecting or rating either
+  const canSelect = canEdit && !isPurchased
+  const canRate = canEdit && !isPurchased
+
+  const handleSelectClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (canSelect) handleSelect(option.id)
+  }
 
   return (
     <div className={`${styles.card} ${option.isSelected ? styles.isSelected : ''} ${option.isFinal ? styles.isFinal : ''}`}>
@@ -76,9 +80,9 @@ const OptionCard = ({ option, canEdit, isOwner, isPurchased }: Props) => {
         <button
           className={`${styles.selectBtn} ${option.isSelected ? styles.selected : ''}`}
           onClick={handleSelectClick}
-          disabled={!canEdit}
+          disabled={!canSelect}
           aria-label={option.isSelected ? 'Seçili' : 'Bu seçeneği seç'}
-          title={canEdit ? 'Bu seçeneği seç' : 'Düzenleme yetkiniz yok'}
+          title={canSelect ? 'Bu seçeneği seç' : isPurchased ? 'Satın alınmış ürün değiştirilemez' : 'Düzenleme yetkiniz yok'}
         >
           {option.isSelected && <span className={styles.selectDot} />}
         </button>
@@ -156,7 +160,7 @@ const OptionCard = ({ option, canEdit, isOwner, isPurchased }: Props) => {
       <div className={styles.ratingRow}>
         <StarRating
           value={option.currentUserScore}
-          onChange={canEdit ? handleRatingChange : undefined}
+          onChange={canRate ? handleRatingChange : undefined}
           size="sm"
         />
         {option.totalRatings > 0 && (

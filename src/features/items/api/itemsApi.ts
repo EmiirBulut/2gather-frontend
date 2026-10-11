@@ -80,6 +80,10 @@ export async function uploadItemImage(itemId: string, image: Blob): Promise<Uplo
   return response.data
 }
 
+export async function undoPurchase(itemId: string): Promise<void> {
+  await apiClient.delete(`/api/items/${itemId}/purchase`)
+}
+
 export async function deleteItem(itemId: string): Promise<void> {
   await apiClient.delete(`/api/items/${itemId}`)
 }

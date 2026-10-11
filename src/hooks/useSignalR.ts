@@ -43,6 +43,11 @@ interface InviteStatusChangedPayload {
   inviteId: string
 }
 
+interface ItemPurchaseUndonePayload {
+  listId: string
+  itemId: string
+}
+
 interface ItemDeletedPayload {
   listId: string
   itemId: string
@@ -206,6 +211,14 @@ export function useSignalR(): void {
               i.id === itemId ? { ...i, status: 'Purchased' as const, purchasedAt } : i
             )
         )
+      })
+    )
+
+    offs.push(
+      onEvent<ItemPurchaseUndonePayload>('ItemPurchaseUndone', ({ listId, itemId }) => {
+        invalidateListAggregates(listId)
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEM_DETAIL(itemId) })
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.OPTIONS(itemId) })
       })
     )
 

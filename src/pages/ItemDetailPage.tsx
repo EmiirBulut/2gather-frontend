@@ -4,6 +4,7 @@ import { useOptions } from '@/features/options/hooks/useOptions'
 import { useCreateOption } from '@/features/options/hooks/useCreateOption'
 import { useItemDetail } from '@/features/items/hooks/useItemDetail'
 import { useUploadItemImage } from '@/features/items/hooks/useUploadItemImage'
+import { useUndoPurchase } from '@/features/items/hooks/useUndoPurchase'
 import { IMAGE_INPUT_ACCEPT, itemImageSchema } from '@/lib/images'
 import { getErrorMessage } from '@/services/api'
 import { usePermission } from '@/hooks/usePermission'
@@ -46,6 +47,7 @@ const ItemDetailPage = () => {
     error: uploadError,
     isSuccess: isUploadSuccess,
   } = useUploadItemImage(listId ?? '')
+  const { mutate: undoPurchase, isPending: isUndoingPurchase, error: undoError } = useUndoPurchase()
   const { data: listDetail } = useListDetail(listId ?? '')
   const { data: options, isLoading: optionsLoading } = useOptions(itemId ?? '')
   const { mutate: handleAddOption, isPending: isAdding, error: addError } = useCreateOption(itemId ?? '')
@@ -87,6 +89,11 @@ const ItemDetailPage = () => {
     uploadImage({ itemId, file: result.data })
   }
 
+  const handleUndoPurchase = () => {
+    if (!confirm('Satın alma geri alınsın mı? Ürün tekrar "Bekliyor" durumuna döner.')) return
+    undoPurchase({ itemId, listId })
+  }
+
   const handlePurchaseSuccess = () => {
     setIsPurchaserModalOpen(false)
     navigate(ROUTES.ITEM_LIST_WITH_ID(listId))
@@ -104,6 +111,9 @@ const ItemDetailPage = () => {
     ? approvedClaimantIds
     : currentUserId ? [currentUserId] : []
   const purchaserNames = item.purchasers.map((p) => p.displayName).join(', ')
+  // A purchased item is locked; only the owner can undo the purchase
+  const canEditItem = canEdit && item.status !== 'Purchased'
+  const undoErrorMessage = getErrorMessage(undoError, 'Satın alma geri alınamadı. Lütfen tekrar deneyin.')
   const imageErrorMessage = imageValidationError
     ?? getErrorMessage(uploadError, 'Görsel yüklenemedi. Lütfen tekrar deneyin.')
     ?? (isImageUploadFailed && !isUploadSuccess ? 'Ürün oluşturuldu ancak görsel yüklenemedi. Buradan tekrar deneyebilirsiniz.' : null)
@@ -131,7 +141,7 @@ const ItemDetailPage = () => {
                 {getCategoryIcon(item.categoryName)}
               </span>
             )}
-            {canEdit && (
+            {canEditItem && (
               <>
                 <button
                   type="button"
@@ -203,7 +213,7 @@ const ItemDetailPage = () => {
               </div>
             </div>
 
-            {canEdit && (
+            {canEditItem && (
               <button
                 className={styles.addOptionBtn}
                 onClick={() => setIsAddingOption(true)}
@@ -296,6 +306,17 @@ const ItemDetailPage = () => {
               {purchaserNames && (
                 <p className={styles.purchasedBy}>Satın alan: {purchaserNames}</p>
               )}
+              {isOwner && (
+                <button
+                  type="button"
+                  className={styles.undoPurchaseBtn}
+                  onClick={handleUndoPurchase}
+                  disabled={isUndoingPurchase}
+                >
+                  {isUndoingPurchase ? 'Geri alınıyor…' : 'Satın almayı geri al'}
+                </button>
+              )}
+              {undoErrorMessage && <p className={styles.imageError}>{undoErrorMessage}</p>}
             </div>
           )}
         </div>
