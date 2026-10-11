@@ -48,6 +48,7 @@ export interface BackendItemDetailDto {
   planningNote: string | null
   status: BackendItemStatus
   purchasedAt: string | null
+  purchasedOptionId: string | null
   createdAt: string
   updatedAt: string
   categoryId: string
@@ -75,6 +76,8 @@ export interface UploadItemImageResponse {
 
 export interface MarkPurchasedRequest {
   purchaserUserIds: string[]
+  // Required by the API when the item has options
+  purchasedOptionId?: string
 }
 
 export type StatusFilter = 'Pending' | 'Purchased' | 'All'

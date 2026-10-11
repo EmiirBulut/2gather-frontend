@@ -14,6 +14,7 @@ import OptionCard from '@/features/options/components/OptionCard'
 import OptionForm from '@/features/options/components/OptionForm'
 import PurchaserSelectModal from '@/features/items/components/PurchaserSelectModal'
 import { useAuthStore } from '@/store/authStore'
+import { formatPrice } from '@/lib/formatters'
 import { ROUTES } from '@/router/routes'
 import type { CreateOptionRequest } from '@/features/options/types'
 import styles from './ItemDetailPage.module.css'
@@ -111,6 +112,11 @@ const ItemDetailPage = () => {
     ? approvedClaimantIds
     : currentUserId ? [currentUserId] : []
   const purchaserNames = item.purchasers.map((p) => p.displayName).join(', ')
+  const purchasedOption = options?.find((o) => o.id === item.purchasedOptionId)
+  // Pre-fill the bought option: final decision, then the selected one, then the only option
+  const defaultPurchasedOptionId = (
+    options?.find((o) => o.isFinal) ?? selectedOption ?? (options?.length === 1 ? options[0] : undefined)
+  )?.id
   // A purchased item is locked; only the owner can undo the purchase
   const canEditItem = canEdit && item.status !== 'Purchased'
   const undoErrorMessage = getErrorMessage(undoError, 'Satın alma geri alınamadı. Lütfen tekrar deneyin.')
@@ -303,6 +309,11 @@ const ItemDetailPage = () => {
                 </svg>
                 Satın Alındı
               </div>
+              {purchasedOption && (
+                <p className={styles.purchasedBy}>
+                  Alınan seçenek: {purchasedOption.title} · {formatPrice(purchasedOption.price)}
+                </p>
+              )}
               {purchaserNames && (
                 <p className={styles.purchasedBy}>Satın alan: {purchaserNames}</p>
               )}
@@ -327,6 +338,8 @@ const ItemDetailPage = () => {
           listId={listId}
           itemId={itemId}
           defaultPurchaserIds={defaultPurchaserIds}
+          options={options ?? []}
+          defaultPurchasedOptionId={defaultPurchasedOptionId}
           onClose={() => setIsPurchaserModalOpen(false)}
           onSuccess={handlePurchaseSuccess}
         />

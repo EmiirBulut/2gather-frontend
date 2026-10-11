@@ -4,14 +4,23 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import Button from '@/components/ui/Button'
 import { useMembers } from '@/features/members/hooks/useMembers'
 import { useMarkPurchased } from '../hooks/useMarkPurchased'
+import { formatPrice } from '@/lib/formatters'
+import type { ItemOptionDto } from '@/features/options/types'
 import { getErrorMessage } from '@/services/api'
 import styles from './PurchaserSelectModal.module.css'
 
-const schema = z.object({
-  purchaserUserIds: z.array(z.string()).min(1, 'En az bir kişi seçin'),
-})
+const createSchema = (hasOptions: boolean) =>
+  z
+    .object({
+      purchaserUserIds: z.array(z.string()).min(1, 'En az bir kişi seçin'),
+      purchasedOptionId: z.string().optional(),
+    })
+    .refine(({ purchasedOptionId }) => !hasOptions || Boolean(purchasedOptionId), {
+      message: 'Hangi seçeneğin alındığını seçin',
+      path: ['purchasedOptionId'],
+    })
 
-type FormValues = z.infer<typeof schema>
+type FormValues = z.infer<ReturnType<typeof createSchema>>
 
 const PURCHASE_ERROR = 'Satın alma kaydedilemedi. Lütfen tekrar deneyin.'
 
@@ -19,21 +28,31 @@ interface Props {
   listId: string
   itemId: string
   defaultPurchaserIds: string[]
+  options: ItemOptionDto[]
+  defaultPurchasedOptionId?: string
   onClose: () => void
   onSuccess: () => void
 }
 
-const PurchaserSelectModal = ({ listId, itemId, defaultPurchaserIds, onClose, onSuccess }: Props) => {
+const PurchaserSelectModal = ({
+  listId,
+  itemId,
+  defaultPurchaserIds,
+  options,
+  defaultPurchasedOptionId,
+  onClose,
+  onSuccess,
+}: Props) => {
   const { data: members, isLoading: isMembersLoading, isError: isMembersError } = useMembers(listId)
   const { mutate: markPurchased, isPending, error } = useMarkPurchased()
 
-  const { control, handleSubmit, formState: { errors } } = useForm<FormValues>({
-    resolver: zodResolver(schema),
-    defaultValues: { purchaserUserIds: defaultPurchaserIds },
+  const { control, register, handleSubmit, watch, formState: { errors } } = useForm<FormValues>({
+    resolver: zodResolver(createSchema(options.length > 0)),
+    defaultValues: { purchaserUserIds: defaultPurchaserIds, purchasedOptionId: defaultPurchasedOptionId },
   })
 
-  const onSubmit = ({ purchaserUserIds }: FormValues) => {
-    markPurchased({ itemId, listId, purchaserUserIds }, { onSuccess })
+  const onSubmit = ({ purchaserUserIds, purchasedOptionId }: FormValues) => {
+    markPurchased({ itemId, listId, purchaserUserIds, purchasedOptionId }, { onSuccess })
   }
 
   const handleOverlayClick = (e: React.MouseEvent) => {
@@ -41,6 +60,7 @@ const PurchaserSelectModal = ({ listId, itemId, defaultPurchaserIds, onClose, on
   }
 
   // 403 carries a user-facing message from useMarkPurchased; anything else gets a generic one
+  const selectedOptionId = watch('purchasedOptionId')
   const errorMessage = error?.statusCode === 403 ? error.message : getErrorMessage(error, PURCHASE_ERROR)
 
   return (
@@ -53,7 +73,7 @@ const PurchaserSelectModal = ({ listId, itemId, defaultPurchaserIds, onClose, on
         onSubmit={handleSubmit(onSubmit)}
       >
         <div className={styles.header}>
-          <h3 className={styles.title} id="purchaser-title">Kim satın aldı?</h3>
+          <h3 className={styles.title} id="purchaser-title">Satın Alındı Olarak İşaretle</h3>
           <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="Kapat">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M12 4 4 12M4 4l8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -61,7 +81,26 @@ const PurchaserSelectModal = ({ listId, itemId, defaultPurchaserIds, onClose, on
           </button>
         </div>
 
-        <p className={styles.hint}>Bu ürünü satın alan kişileri seçin. Birden fazla kişi seçebilirsiniz.</p>
+        {options.length > 0 && (
+          <>
+            <p className={styles.sectionLabel}>Hangi seçenek alındı?</p>
+            <div className={styles.memberList} role="radiogroup">
+              {options.map(({ id, title, price }) => (
+                <label
+                  key={id}
+                  className={`${styles.memberRow} ${selectedOptionId === id ? styles.memberRowChecked : ''}`}
+                >
+                  <input type="radio" className={styles.checkbox} value={id} {...register('purchasedOptionId')} />
+                  <span className={styles.memberName}>{title}</span>
+                  <span className={styles.optionPrice}>{formatPrice(price)}</span>
+                </label>
+              ))}
+            </div>
+            {errors.purchasedOptionId && <p className={styles.errorText}>{errors.purchasedOptionId.message}</p>}
+          </>
+        )}
+
+        <p className={styles.sectionLabel}>Kim satın aldı? <span className={styles.hintInline}>(birden fazla seçebilirsiniz)</span></p>
 
         {isMembersLoading && <p className={styles.hint}>Üyeler yükleniyor…</p>}
         {isMembersError && <p className={styles.errorText}>Üye listesi yüklenemedi.</p>}

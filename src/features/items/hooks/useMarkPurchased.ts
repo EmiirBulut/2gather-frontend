@@ -8,6 +8,7 @@ interface Variables {
   itemId: string
   listId: string
   purchaserUserIds: string[]
+  purchasedOptionId?: string
 }
 
 const FORBIDDEN_MESSAGE =
@@ -17,7 +18,8 @@ export function useMarkPurchased() {
   const queryClient = useQueryClient()
 
   return useMutation<void, ApiError, Variables>({
-    mutationFn: ({ itemId, purchaserUserIds }) => markPurchased(itemId, { purchaserUserIds }),
+    mutationFn: ({ itemId, purchaserUserIds, purchasedOptionId }) =>
+      markPurchased(itemId, { purchaserUserIds, purchasedOptionId }),
 
     // Optimistic update: remove from Pending immediately
     onMutate: async ({ itemId, listId }) => {
