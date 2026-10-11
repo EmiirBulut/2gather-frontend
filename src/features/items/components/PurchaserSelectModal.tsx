@@ -13,7 +13,8 @@ const createSchema = (hasOptions: boolean) =>
   z
     .object({
       purchaserUserIds: z.array(z.string()).min(1, 'En az bir kişi seçin'),
-      purchasedOptionId: z.string().optional(),
+      // An unchecked radio group is null in react-hook-form
+      purchasedOptionId: z.string().nullish(),
     })
     .refine(({ purchasedOptionId }) => !hasOptions || Boolean(purchasedOptionId), {
       message: 'Hangi seçeneğin alındığını seçin',
@@ -52,7 +53,7 @@ const PurchaserSelectModal = ({
   })
 
   const onSubmit = ({ purchaserUserIds, purchasedOptionId }: FormValues) => {
-    markPurchased({ itemId, listId, purchaserUserIds, purchasedOptionId }, { onSuccess })
+    markPurchased({ itemId, listId, purchaserUserIds, purchasedOptionId: purchasedOptionId ?? undefined }, { onSuccess })
   }
 
   const handleOverlayClick = (e: React.MouseEvent) => {
