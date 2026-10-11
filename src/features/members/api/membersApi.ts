@@ -1,5 +1,15 @@
 import { apiClient } from '@/services/api'
-import type { BackendMemberDto, BackendMemberRole, InviteMemberRequest, MemberDto, MemberRole, PendingInviteDto } from '../types'
+import type {
+  BackendInviteEmailStatus,
+  BackendMemberDto,
+  BackendMemberRole,
+  BackendPendingInviteDto,
+  InviteEmailStatus,
+  InviteMemberRequest,
+  MemberDto,
+  MemberRole,
+  PendingInviteDto,
+} from '../types'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -14,6 +24,15 @@ const ROLE_MAP: Record<BackendMemberRole, MemberRole> = {
   0: 'Owner',
   1: 'Editor',
   2: 'Viewer',
+}
+
+const EMAIL_STATUS_MAP: Record<BackendInviteEmailStatus, InviteEmailStatus> = {
+  0: 'Pending',
+  1: 'Sent',
+  2: 'Failed',
+  3: 'Delivered',
+  4: 'Bounced',
+  5: 'Complained',
 }
 
 // ─── Members API Functions ────────────────────────────────────────────────────
@@ -31,10 +50,14 @@ export async function inviteMember(
 }
 
 export async function getPendingInvites(listId: string): Promise<PendingInviteDto[]> {
-  const response = await apiClient.get<PendingInviteDto[]>(
+  const response = await apiClient.get<BackendPendingInviteDto[]>(
     `/api/lists/${listId}/members/invites`
   )
-  return response.data
+  return response.data.map((invite) => ({
+    ...invite,
+    role: ROLE_MAP[invite.role],
+    emailStatus: EMAIL_STATUS_MAP[invite.emailStatus],
+  }))
 }
 
 export async function cancelInvite(listId: string, inviteId: string): Promise<void> {

@@ -32,6 +32,11 @@ interface ItemImageUpdatedPayload {
   imageUrl: string
 }
 
+interface InviteStatusChangedPayload {
+  listId: string
+  inviteId: string
+}
+
 interface ItemDeletedPayload {
   listId: string
   itemId: string
@@ -291,6 +296,12 @@ export function useSignalR(): void {
     )
 
     // ── Members ────────────────────────────────────────────────────────────
+
+    offs.push(
+      onEvent<InviteStatusChangedPayload>('InviteStatusChanged', ({ listId }) => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PENDING_INVITES(listId) })
+      })
+    )
 
     offs.push(
       onEvent<MemberJoinedPayload>('MemberJoined', ({ listId, member }) => {

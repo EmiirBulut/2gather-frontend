@@ -37,7 +37,12 @@ export function useCancelInvite(listId: string) {
 }
 
 export function useResendInvite(listId: string) {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (inviteId: string) => resendInvite(listId, inviteId),
+    // Status, send count and expiry change whether or not the email went out
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PENDING_INVITES(listId) })
+    },
   })
 }
