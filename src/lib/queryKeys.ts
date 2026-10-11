@@ -20,8 +20,11 @@ export const QUERY_KEYS = {
   CATEGORIES: (listId: string) => ['categories', listId] as const,
 
   // Reports
-  REPORTS_SUMMARY: (listId: string) => ['reports', 'summary', listId] as const,
-  REPORTS_CATEGORY: (listId: string) => ['reports', 'category', listId] as const,
+  // Scoped under listId so REPORTS(listId) invalidates every report of a list
+  REPORTS: (listId: string) => ['reports', listId] as const,
+  REPORTS_SUMMARY: (listId: string) => ['reports', listId, 'summary'] as const,
+  REPORTS_CATEGORY: (listId: string) => ['reports', listId, 'category'] as const,
+  REPORT_ITEMS: (listId: string) => ['reports', listId, 'items'] as const,
 
   // Ratings
   RATINGS: (optionId: string) => ['ratings', optionId] as const,

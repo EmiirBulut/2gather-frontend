@@ -32,16 +32,19 @@ interface ItemDeletedPayload {
 }
 
 interface OptionAddedPayload {
+  listId: string
   itemId: string
   option: ItemOptionDto
 }
 
 interface OptionUpdatedPayload {
+  listId: string
   itemId: string
   option: ItemOptionDto
 }
 
 interface OptionDeletedPayload {
+  listId: string
   itemId: string
   optionId: string
 }
@@ -62,10 +65,12 @@ interface OptionRatingUpdatedPayload {
 }
 
 interface OptionFinalizedPayload {
+  listId: string
   itemId: string
 }
 
 interface OptionFinalRemovedPayload {
+  listId: string
   itemId: string
 }
 
@@ -126,10 +131,17 @@ export function useSignalR(): void {
 
     const offs: Array<() => void> = []
 
+    // Budget totals and reports depend on items and option prices/decisions
+    const invalidateListAggregates = (listId: string) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LIST_DETAIL(listId) })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REPORTS(listId) })
+    }
+
     // ── Items ──────────────────────────────────────────────────────────────
 
     offs.push(
       onEvent<ItemAddedPayload>('ItemAdded', ({ listId, item }) => {
+        invalidateListAggregates(listId)
         for (const status of ['Pending', 'All'] as const) {
           queryClient.setQueryData<ItemDto[]>(
             QUERY_KEYS.ITEMS(listId, status),
@@ -141,6 +153,7 @@ export function useSignalR(): void {
 
     offs.push(
       onEvent<ItemUpdatedPayload>('ItemUpdated', ({ listId, item }) => {
+        invalidateListAggregates(listId)
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEM_DETAIL(item.id) })
         for (const status of ['Pending', 'Purchased', 'All'] as const) {
           queryClient.setQueryData<ItemDto[]>(
@@ -153,6 +166,7 @@ export function useSignalR(): void {
 
     offs.push(
       onEvent<ItemPurchasedPayload>('ItemPurchased', ({ listId, itemId, purchasedAt }) => {
+        invalidateListAggregates(listId)
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEM_DETAIL(itemId) })
         // Remove from Pending, update in Purchased + All
         queryClient.setQueryData<ItemDto[]>(
@@ -180,6 +194,7 @@ export function useSignalR(): void {
 
     offs.push(
       onEvent<ItemDeletedPayload>('ItemDeleted', ({ listId, itemId }) => {
+        invalidateListAggregates(listId)
         for (const status of ['Pending', 'Purchased', 'All'] as const) {
           queryClient.setQueryData<ItemDto[]>(
             QUERY_KEYS.ITEMS(listId, status),
@@ -192,7 +207,8 @@ export function useSignalR(): void {
     // ── Options ────────────────────────────────────────────────────────────
 
     offs.push(
-      onEvent<OptionAddedPayload>('OptionAdded', ({ itemId, option }) => {
+      onEvent<OptionAddedPayload>('OptionAdded', ({ listId, itemId, option }) => {
+        invalidateListAggregates(listId)
         queryClient.setQueryData<ItemOptionDto[]>(
           QUERY_KEYS.OPTIONS(itemId),
           (old) => (old ? [...old, option] : [option])
@@ -201,7 +217,8 @@ export function useSignalR(): void {
     )
 
     offs.push(
-      onEvent<OptionUpdatedPayload>('OptionUpdated', ({ itemId, option }) => {
+      onEvent<OptionUpdatedPayload>('OptionUpdated', ({ listId, itemId, option }) => {
+        invalidateListAggregates(listId)
         queryClient.setQueryData<ItemOptionDto[]>(
           QUERY_KEYS.OPTIONS(itemId),
           (old) => old?.map((o) => (o.id === option.id ? option : o))
@@ -210,7 +227,8 @@ export function useSignalR(): void {
     )
 
     offs.push(
-      onEvent<OptionDeletedPayload>('OptionDeleted', ({ itemId, optionId }) => {
+      onEvent<OptionDeletedPayload>('OptionDeleted', ({ listId, itemId, optionId }) => {
+        invalidateListAggregates(listId)
         queryClient.setQueryData<ItemOptionDto[]>(
           QUERY_KEYS.OPTIONS(itemId),
           (old) => old?.filter((o) => o.id !== optionId)
@@ -229,13 +247,15 @@ export function useSignalR(): void {
     // ── Final decision ────────────────────────────────────────────────────
 
     offs.push(
-      onEvent<OptionFinalizedPayload>('OptionFinalized', ({ itemId }) => {
+      onEvent<OptionFinalizedPayload>('OptionFinalized', ({ listId, itemId }) => {
+        invalidateListAggregates(listId)
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.OPTIONS(itemId) })
       })
     )
 
     offs.push(
-      onEvent<OptionFinalRemovedPayload>('OptionFinalRemoved', ({ itemId }) => {
+      onEvent<OptionFinalRemovedPayload>('OptionFinalRemoved', ({ listId, itemId }) => {
+        invalidateListAggregates(listId)
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.OPTIONS(itemId) })
       })
     )

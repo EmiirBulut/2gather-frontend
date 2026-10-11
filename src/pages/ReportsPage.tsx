@@ -1,6 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { useReportsSummary, useCategoryReport } from '@/features/reports/hooks/useReports'
-import { useItems } from '@/features/items/hooks/useItems'
+import { useReportsSummary, useCategoryReport, useReportItems } from '@/features/reports/hooks/useReports'
 import { useListDetail } from '@/features/lists/hooks/useListDetail'
 import { Breadcrumb } from '@/components/layout/Breadcrumb'
 import SegmentedProgressBar from '@/components/ui/SegmentedProgressBar'
@@ -32,7 +31,7 @@ const ReportsPage = () => {
   const { data: listDetail } = useListDetail(listId ?? '')
   const { data: summary, isLoading: isSummaryLoading, isError: isSummaryError } = useReportsSummary(listId ?? '')
   const { data: categories, isLoading: isCatLoading, isError: isCatError } = useCategoryReport(listId ?? '')
-  const { data: items, isLoading: isItemsLoading } = useItems(listId ?? '', 'All')
+  const { data: items, isLoading: isItemsLoading, isError: isItemsError } = useReportItems(listId ?? '')
 
   if (!listId) {
     navigate(ROUTES.LISTS)
@@ -156,7 +155,7 @@ const ReportsPage = () => {
           </div>
         </div>
 
-        {isCatError && (
+        {(isCatError || isItemsError) && (
           <p className={styles.errorText}>İtem verisi yüklenemedi.</p>
         )}
 
@@ -168,7 +167,7 @@ const ReportsPage = () => {
               <span className={styles.colImage}>GÖRSEL</span>
               <span className={styles.colName}>İTEM ADI</span>
               <span className={styles.colCategory}>KATEGORİ</span>
-              <span className={styles.colPrice}>TAHMİNİ FİYAT</span>
+              <span className={styles.colPrice}>FİYAT</span>
               <span className={styles.colStatus}>DURUM</span>
             </div>
             {items.map((item) => (
@@ -190,7 +189,7 @@ const ReportsPage = () => {
                 <span className={styles.colCategory}>
                   <span className={styles.categoryBadge}>{item.categoryName}</span>
                 </span>
-                <span className={styles.colPrice}>—</span>
+                <span className={styles.colPrice}>{formatPrice(item.estimatedPrice)}</span>
                 <span className={styles.colStatus}>
                   <span className={`${styles.statusBadge} ${item.status === 'Purchased' ? styles.statusPurchased : styles.statusPending}`}>
                     {item.status === 'Purchased' ? 'Satın Alındı' : 'Bekliyor'}

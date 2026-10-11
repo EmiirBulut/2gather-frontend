@@ -1,6 +1,6 @@
 import { apiClient } from '@/services/api'
 import { getItems } from '@/features/items/api/itemsApi'
-import type { ListSummaryReport, CategoryReport } from '../types'
+import type { BackendReportItemDto, CategoryReport, ListSummaryReport, ReportItemDto } from '../types'
 
 // ─── Reports API Functions ────────────────────────────────────────────────────
 
@@ -9,6 +9,16 @@ export async function getSummary(listId: string): Promise<ListSummaryReport> {
     `/api/lists/${listId}/reports/summary`
   )
   return response.data
+}
+
+export async function getReportItems(listId: string): Promise<ReportItemDto[]> {
+  const response = await apiClient.get<BackendReportItemDto[]>(
+    `/api/lists/${listId}/reports/items`
+  )
+  return response.data.map((item) => ({
+    ...item,
+    status: item.status === 0 ? 'Pending' : 'Purchased',
+  }))
 }
 
 // No backend endpoint for category breakdown — compute from items.
