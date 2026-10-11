@@ -1,5 +1,7 @@
 // ─── Reports Feature Types ────────────────────────────────────────────────────
 
+import type { MemberAvatarDto } from '@/features/lists/types'
+
 // Shape returned by GET /api/lists/:id/reports/summary
 export interface ListSummaryReport {
   totalItems: number
@@ -26,6 +28,7 @@ export interface BackendReportItemDto {
   status: BackendReportItemStatus
   purchasedAt: string | null
   optionsCount: number
+  purchasers: MemberAvatarDto[]
 }
 
 export interface ReportItemDto extends Omit<BackendReportItemDto, 'status'> {

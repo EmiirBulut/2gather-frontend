@@ -168,6 +168,7 @@ const ReportsPage = () => {
               <span className={styles.colName}>İTEM ADI</span>
               <span className={styles.colCategory}>KATEGORİ</span>
               <span className={styles.colPrice}>FİYAT</span>
+              <span className={styles.colPurchasers}>SATIN ALAN</span>
               <span className={styles.colStatus}>DURUM</span>
             </div>
             {items.map((item) => (
@@ -190,6 +191,9 @@ const ReportsPage = () => {
                   <span className={styles.categoryBadge}>{item.categoryName}</span>
                 </span>
                 <span className={styles.colPrice}>{formatPrice(item.estimatedPrice)}</span>
+                <span className={styles.colPurchasers}>
+                  {item.purchasers.length > 0 ? item.purchasers.map((p) => p.displayName).join(', ') : '—'}
+                </span>
                 <span className={styles.colStatus}>
                   <span className={`${styles.statusBadge} ${item.status === 'Purchased' ? styles.statusPurchased : styles.statusPending}`}>
                     {item.status === 'Purchased' ? 'Satın Alındı' : 'Bekliyor'}

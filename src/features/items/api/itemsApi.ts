@@ -8,6 +8,7 @@ import type {
   ItemDetailDto,
   ItemDto,
   ItemStatus,
+  MarkPurchasedRequest,
   StatusFilter,
 } from '../types'
 
@@ -60,8 +61,8 @@ export async function createItem(data: CreateItemRequest): Promise<ItemDto> {
   return toItemDto(itemResponse.data, categoryMap)
 }
 
-export async function markPurchased(itemId: string): Promise<void> {
-  await apiClient.patch(`/api/items/${itemId}/status`, { status: 1 })
+export async function markPurchased(itemId: string, data: MarkPurchasedRequest): Promise<void> {
+  await apiClient.patch(`/api/items/${itemId}/status`, data)
 }
 
 export async function deleteItem(itemId: string): Promise<void> {

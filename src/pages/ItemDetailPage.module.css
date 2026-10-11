@@ -269,5 +269,12 @@
 
 .stateText {
   color: var(--color-text-muted);
-  font-size: var(--text-sm);
+  font-size: 14px;
+}
+
+.purchasedBy {
+  margin-top: var(--space-2);
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-text-secondary);
 }

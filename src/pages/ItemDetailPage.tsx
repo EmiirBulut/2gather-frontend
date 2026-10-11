@@ -2,13 +2,14 @@ import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useOptions } from '@/features/options/hooks/useOptions'
 import { useCreateOption } from '@/features/options/hooks/useCreateOption'
-import { useMarkPurchased } from '@/features/items/hooks/useMarkPurchased'
 import { useItemDetail } from '@/features/items/hooks/useItemDetail'
 import { usePermission } from '@/hooks/usePermission'
 import { useListDetail } from '@/features/lists/hooks/useListDetail'
 import { Breadcrumb } from '@/components/layout/Breadcrumb'
 import OptionCard from '@/features/options/components/OptionCard'
 import OptionForm from '@/features/options/components/OptionForm'
+import PurchaserSelectModal from '@/features/items/components/PurchaserSelectModal'
+import { useAuthStore } from '@/store/authStore'
 import { ROUTES } from '@/router/routes'
 import type { CreateOptionRequest } from '@/features/options/types'
 import styles from './ItemDetailPage.module.css'
@@ -27,13 +28,14 @@ const ItemDetailPage = () => {
   const navigate = useNavigate()
 
   const [isAddingOption, setIsAddingOption] = useState(false)
+  const [isPurchaserModalOpen, setIsPurchaserModalOpen] = useState(false)
+  const currentUserId = useAuthStore((s) => s.user?.id)
 
   const { canEdit, isOwner } = usePermission(listId ?? '')
   const { data: item, isLoading: isItemLoading, isError: isItemError } = useItemDetail(itemId ?? '')
   const { data: listDetail } = useListDetail(listId ?? '')
   const { data: options, isLoading: optionsLoading } = useOptions(itemId ?? '')
   const { mutate: handleAddOption, isPending: isAdding, error: addError } = useCreateOption(itemId ?? '')
-  const { mutate: handleMarkPurchased, isPending: isMarkingPurchased } = useMarkPurchased()
 
   if (!listId || !itemId) {
     navigate(ROUTES.LISTS)
@@ -59,15 +61,23 @@ const ItemDetailPage = () => {
     )
   }
 
-  const handleMarkPurchasedClick = () => {
-    handleMarkPurchased(
-      { itemId, listId },
-      { onSuccess: () => navigate(ROUTES.ITEM_LIST_WITH_ID(listId)) }
-    )
+  const handlePurchaseSuccess = () => {
+    setIsPurchaserModalOpen(false)
+    navigate(ROUTES.ITEM_LIST_WITH_ID(listId))
   }
 
   const listName = listDetail?.name ?? '—'
   const selectedOption = options?.find((o) => o.isSelected)
+
+  // Pre-select approved claimants of the final option; otherwise the current user
+  const approvedClaimantIds = options
+    ?.find((o) => o.isFinal)
+    ?.claims.filter((c) => c.status === 1)
+    .map((c) => c.userId) ?? []
+  const defaultPurchaserIds = approvedClaimantIds.length > 0
+    ? approvedClaimantIds
+    : currentUserId ? [currentUserId] : []
+  const purchaserNames = item.purchasers.map((p) => p.displayName).join(', ')
 
   return (
     <div className={styles.page}>
@@ -214,10 +224,9 @@ const ItemDetailPage = () => {
             <div className={styles.panelCard}>
               <button
                 className={styles.markPurchasedBtn}
-                onClick={handleMarkPurchasedClick}
-                disabled={isMarkingPurchased}
+                onClick={() => setIsPurchaserModalOpen(true)}
               >
-                {isMarkingPurchased ? 'İşleniyor…' : '✓ Satın Alındı Olarak İşaretle'}
+                ✓ Satın Alındı Olarak İşaretle
               </button>
             </div>
           )}
@@ -230,10 +239,23 @@ const ItemDetailPage = () => {
                 </svg>
                 Satın Alındı
               </div>
+              {purchaserNames && (
+                <p className={styles.purchasedBy}>Satın alan: {purchaserNames}</p>
+              )}
             </div>
           )}
         </div>
       </div>
+
+      {isPurchaserModalOpen && (
+        <PurchaserSelectModal
+          listId={listId}
+          itemId={itemId}
+          defaultPurchaserIds={defaultPurchaserIds}
+          onClose={() => setIsPurchaserModalOpen(false)}
+          onSuccess={handlePurchaseSuccess}
+        />
+      )}
     </div>
   )
 }

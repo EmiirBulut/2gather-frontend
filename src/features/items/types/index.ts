@@ -45,6 +45,7 @@ export interface BackendItemDetailDto {
   categoryName: string
   roomLabel: string
   assignedTo: MemberAvatarDto | null
+  purchasers: MemberAvatarDto[]
   options: ItemOptionDto[]
 }
 
@@ -56,6 +57,10 @@ export interface CreateItemRequest {
   listId: string
   categoryId: string
   name: string
+}
+
+export interface MarkPurchasedRequest {
+  purchaserUserIds: string[]
 }
 
 export type StatusFilter = 'Pending' | 'Purchased' | 'All'
