@@ -292,3 +292,11 @@
   letter-spacing: 0.1em;
   line-height: 1.8;
 }
+
+.fieldHint {
+  margin-top: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}

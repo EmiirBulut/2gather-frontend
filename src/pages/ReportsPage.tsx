@@ -16,17 +16,19 @@ import styles from './ReportsPage.module.css'
 interface ReportItemFilters {
   status: StatusFilter
   categoryId: string | null
+  roomLabel: string | null
   search: string
 }
 
 const filterReportItems = (
   items: ReportItemDto[],
-  { status, categoryId, search }: ReportItemFilters
+  { status, categoryId, roomLabel, search }: ReportItemFilters
 ): ReportItemDto[] => {
   const query = search.trim().toLocaleLowerCase('tr-TR')
   return items.filter((item) =>
     (status === 'All' || item.status === status) &&
     (categoryId === null || item.categoryId === categoryId) &&
+    (roomLabel === null || item.roomLabel === roomLabel) &&
     (query === '' || item.name.toLocaleLowerCase('tr-TR').includes(query))
   )
 }
@@ -50,6 +52,7 @@ const ReportsPage = () => {
 
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('All')
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null)
+  const [roomLabelFilter, setRoomLabelFilter] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebouncedValue(search, 300)
 
@@ -73,8 +76,11 @@ const ReportsPage = () => {
   const filteredItems = filterReportItems(items ?? [], {
     status: statusFilter,
     categoryId: categoryFilter,
+    roomLabel: roomLabelFilter,
     search: debouncedSearch,
   })
+  const roomLabels = [...new Set((items ?? []).map((item) => item.roomLabel).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, 'tr'))
 
   return (
     <div className={styles.page}>
@@ -193,9 +199,12 @@ const ReportsPage = () => {
               listId={listId}
               status={statusFilter}
               categoryId={categoryFilter}
+              roomLabels={roomLabels}
+              roomLabel={roomLabelFilter}
               search={search}
               onStatusChange={setStatusFilter}
               onCategoryChange={setCategoryFilter}
+              onRoomLabelChange={setRoomLabelFilter}
               onSearchChange={setSearch}
             />
             {filteredItems.length > 0 ? (

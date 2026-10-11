@@ -149,6 +149,10 @@ const NewItemPage = () => {
                 placeholder="Ör: Koltuk takımı, TV ünitesi…"
               />
               {errors.name && <p className={styles.errorText}>{errors.name.message}</p>}
+              <p className={styles.fieldHint}>
+                Ürün tipini yazın (ör. Koltuk). Farklı mağaza veya modelleri ayrı ürün olarak değil,
+                bu ürünün içine seçenek olarak ekleyin.
+              </p>
             </div>
 
             {/* Kategori seçimi */}

@@ -14,6 +14,17 @@ export interface ListSummaryReport {
 // Backend returns status as integer: 0 = Pending, 1 = Purchased
 export type BackendReportItemStatus = 0 | 1
 
+// An alternative of a report item — mirrors backend ReportOptionDto
+export interface ReportOptionDto {
+  id: string
+  title: string
+  price: number | null
+  currency: string | null
+  isFinal: boolean
+  isSelected: boolean
+  isPurchased: boolean
+}
+
 // Shape returned by GET /api/lists/:id/reports/items — mirrors backend ReportItemDto.
 // estimatedPrice follows the shared rule: final > selected > most expensive option.
 export interface BackendReportItemDto {
@@ -23,12 +34,15 @@ export interface BackendReportItemDto {
   selectedOptionTitle: string | null
   categoryId: string
   categoryName: string
+  roomLabel: string
   estimatedPrice: number | null
   currency: string | null
   status: BackendReportItemStatus
   purchasedAt: string | null
   optionsCount: number
   purchasers: MemberAvatarDto[]
+  // Most expensive first
+  options: ReportOptionDto[]
 }
 
 export interface ReportItemDto extends Omit<BackendReportItemDto, 'status'> {
