@@ -15,8 +15,11 @@ export interface BackendItemDto {
   name: string
   status: BackendItemStatus
   purchasedAt: string | null
+  imageUrl: string | null
+  planningNote: string | null
   optionsCount: number
   createdAt: string
+  updatedAt: string
 }
 
 export interface ItemDto {
@@ -27,8 +30,11 @@ export interface ItemDto {
   name: string
   status: ItemStatus
   purchasedAt: string | null
+  imageUrl: string | null
+  planningNote: string | null
   optionsCount: number
   createdAt: string
+  updatedAt: string
 }
 
 // GET /api/items/:itemId — mirrors backend ItemDetailDto
@@ -57,6 +63,11 @@ export interface CreateItemRequest {
   listId: string
   categoryId: string
   name: string
+}
+
+// POST /api/items/:itemId/image
+export interface UploadItemImageResponse {
+  imageUrl: string
 }
 
 export interface MarkPurchasedRequest {

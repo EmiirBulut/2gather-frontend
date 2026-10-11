@@ -31,7 +31,7 @@ const ReportItemTable = ({ listId, items }: Props) => {
         <span className={styles.colPurchasers}>SATIN ALAN</span>
         <span className={styles.colStatus}>DURUM</span>
       </div>
-      {items.map(({ id, name, categoryName, optionsCount, estimatedPrice, purchasers, status }) => {
+      {items.map(({ id, name, imageUrl, categoryName, optionsCount, estimatedPrice, purchasers, status }) => {
         const detailPath = ROUTES.ITEM_DETAIL_WITH_ID(listId, id)
         const isPurchased = status === 'Purchased'
         const purchaserNames = purchasers.length > 0 ? purchasers.map((p) => p.displayName).join(', ') : '—'
@@ -46,7 +46,11 @@ const ReportItemTable = ({ listId, items }: Props) => {
             onKeyDown={(e) => e.key === 'Enter' && navigate(detailPath)}
           >
             <span className={styles.colImage}>
-              <span className={styles.itemEmoji}>{getCategoryIcon(categoryName)}</span>
+              {imageUrl ? (
+                <img src={imageUrl} alt={name} className={styles.thumbnail} loading="lazy" />
+              ) : (
+                <span className={styles.itemEmoji}>{getCategoryIcon(categoryName)}</span>
+              )}
             </span>
             <span className={styles.colName}>
               <span className={styles.itemName}>{name}</span>

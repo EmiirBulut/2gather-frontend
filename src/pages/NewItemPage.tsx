@@ -5,6 +5,9 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import PriceInput from '@/components/ui/PriceInput'
 import { useCreateItem } from '@/features/items/hooks/useCreateItem'
+import { useUploadItemImage } from '@/features/items/hooks/useUploadItemImage'
+import { IMAGE_INPUT_ACCEPT, itemImageSchema } from '@/lib/images'
+import type { ItemDto } from '@/features/items/types'
 import { useCreateOption } from '@/features/options/hooks/useCreateOption'
 import { useCategories } from '@/features/categories/hooks/useCategories'
 import { useListDetail } from '@/features/lists/hooks/useListDetail'
@@ -19,6 +22,7 @@ const schema = z.object({
   link: z.string().url('Geçerli bir URL giriniz').optional().or(z.literal('')),
   price: z.number().positive('Fiyat pozitif olmalıdır').optional(),
   currency: z.string().optional(),
+  image: itemImageSchema.optional(),
 })
 
 type FormValues = z.infer<typeof schema>
@@ -43,6 +47,7 @@ const NewItemPage = () => {
   const { mutate: createItem, isPending: isCreatingItem, error: itemError } = useCreateItem(listId ?? '')
   const [createdItemId, setCreatedItemId] = useState<string | null>(null)
   const { mutate: createOption, isPending: isCreatingOption } = useCreateOption(createdItemId ?? '')
+  const { mutateAsync: uploadImage, isPending: isUploadingImage } = useUploadItemImage(listId ?? '')
 
   const {
     register,
@@ -68,36 +73,53 @@ const NewItemPage = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+    setValue('image', file, { shouldValidate: true })
     const reader = new FileReader()
     reader.onload = () => setImagePreview(reader.result as string)
     reader.readAsDataURL(file)
   }
 
-  const isPending = isCreatingItem || isCreatingOption
+  const isPending = isCreatingItem || isCreatingOption || isUploadingImage
+
+  // Returns false when the upload fails; the item itself is already created at that point
+  const uploadImageSafely = async (itemId: string, file: File): Promise<boolean> => {
+    try {
+      await uploadImage({ itemId, file })
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  const handleItemCreated = async (item: ItemDto, data: FormValues) => {
+    const isImageUploaded = data.image ? await uploadImageSafely(item.id, data.image) : true
+    const goNext = () =>
+      isImageUploaded
+        ? navigate(ROUTES.ITEM_LIST_WITH_ID(listId))
+        : navigate(ROUTES.ITEM_DETAIL_WITH_ID(listId, item.id), { state: { isImageUploadFailed: true } })
+
+    const hasOption = data.store || (data.link && data.link !== '') || !!data.price
+    if (!hasOption) {
+      goNext()
+      return
+    }
+    setCreatedItemId(item.id)
+    createOption(
+      {
+        itemId: item.id,
+        title: data.store || item.name,
+        price: data.price,
+        currency: data.currency || 'TRY',
+        link: data.link || undefined,
+      },
+      { onSuccess: goNext }
+    )
+  }
 
   const onSubmit = (data: FormValues) => {
     createItem(
       { listId, categoryId: data.categoryId, name: data.name },
-      {
-        onSuccess: (item) => {
-          const hasOption = data.store || (data.link && data.link !== '') || !!data.price
-          if (hasOption) {
-            setCreatedItemId(item.id)
-            createOption(
-              {
-                itemId: item.id,
-                title: data.store || item.name,
-                price: data.price,
-                currency: data.currency || 'TRY',
-                link: data.link || undefined,
-              },
-              { onSuccess: () => navigate(ROUTES.ITEM_LIST_WITH_ID(listId)) }
-            )
-          } else {
-            navigate(ROUTES.ITEM_LIST_WITH_ID(listId))
-          }
-        },
-      }
+      { onSuccess: (item) => handleItemCreated(item, data) }
     )
   }
 
@@ -255,10 +277,11 @@ const NewItemPage = () => {
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept={IMAGE_INPUT_ACCEPT}
               style={{ display: 'none' }}
               onChange={handleImageChange}
             />
+            {errors.image && <p className={styles.errorText}>{errors.image.message}</p>}
           </div>
         </div>
       </form>

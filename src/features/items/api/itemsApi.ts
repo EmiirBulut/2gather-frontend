@@ -10,6 +10,7 @@ import type {
   ItemStatus,
   MarkPurchasedRequest,
   StatusFilter,
+  UploadItemImageResponse,
 } from '../types'
 
 // ─── Adapter ─────────────────────────────────────────────────────────────────
@@ -27,8 +28,11 @@ function toItemDto(raw: BackendItemDto, categoryMap: Map<string, string>): ItemD
     name: raw.name,
     status: toItemStatus(raw.status),
     purchasedAt: raw.purchasedAt,
+    imageUrl: raw.imageUrl,
+    planningNote: raw.planningNote,
     optionsCount: raw.optionsCount,
     createdAt: raw.createdAt,
+    updatedAt: raw.updatedAt,
   }
 }
 
@@ -63,6 +67,16 @@ export async function createItem(data: CreateItemRequest): Promise<ItemDto> {
 
 export async function markPurchased(itemId: string, data: MarkPurchasedRequest): Promise<void> {
   await apiClient.patch(`/api/items/${itemId}/status`, data)
+}
+
+export async function uploadItemImage(itemId: string, image: Blob): Promise<UploadItemImageResponse> {
+  const formData = new FormData()
+  formData.append('file', image, 'image.webp')
+  // The shared instance defaults to JSON, which would make axios serialize FormData as JSON
+  const response = await apiClient.post<UploadItemImageResponse>(`/api/items/${itemId}/image`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return response.data
 }
 
 export async function deleteItem(itemId: string): Promise<void> {

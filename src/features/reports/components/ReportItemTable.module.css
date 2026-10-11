@@ -122,3 +122,10 @@
   background: var(--color-status-pending-bg);
   color: var(--color-status-pending);
 }
+
+.thumbnail {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+}

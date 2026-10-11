@@ -162,9 +162,13 @@ const ItemListPage = () => {
                   onKeyDown={(e) => e.key === 'Enter' && navigate(ROUTES.ITEM_DETAIL_WITH_ID(listId, item.id))}
                 >
                   <div className={styles.cardImage}>
-                    <span className={styles.cardImagePlaceholder}>
-                      {getCategoryIcon(item.categoryName)}
-                    </span>
+                    {item.imageUrl ? (
+                      <img src={item.imageUrl} alt={item.name} loading="lazy" />
+                    ) : (
+                      <span className={styles.cardImagePlaceholder}>
+                        {getCategoryIcon(item.categoryName)}
+                      </span>
+                    )}
                     <div className={styles.cardIconBadge}>
                       {getCategoryIcon(item.categoryName)}
                     </div>

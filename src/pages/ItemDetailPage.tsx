@@ -1,8 +1,10 @@
-import { useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useRef, useState } from 'react'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useOptions } from '@/features/options/hooks/useOptions'
 import { useCreateOption } from '@/features/options/hooks/useCreateOption'
 import { useItemDetail } from '@/features/items/hooks/useItemDetail'
+import { useUploadItemImage } from '@/features/items/hooks/useUploadItemImage'
+import { IMAGE_INPUT_ACCEPT, itemImageSchema } from '@/lib/images'
 import { usePermission } from '@/hooks/usePermission'
 import { useListDetail } from '@/features/lists/hooks/useListDetail'
 import { Breadcrumb } from '@/components/layout/Breadcrumb'
@@ -30,9 +32,19 @@ const ItemDetailPage = () => {
   const [isAddingOption, setIsAddingOption] = useState(false)
   const [isPurchaserModalOpen, setIsPurchaserModalOpen] = useState(false)
   const currentUserId = useAuthStore((s) => s.user?.id)
+  const location = useLocation()
+  const isImageUploadFailed = (location.state as { isImageUploadFailed?: boolean } | null)?.isImageUploadFailed === true
+  const imageInputRef = useRef<HTMLInputElement>(null)
+  const [imageValidationError, setImageValidationError] = useState<string | null>(null)
 
   const { canEdit, isOwner } = usePermission(listId ?? '')
   const { data: item, isLoading: isItemLoading, isError: isItemError } = useItemDetail(itemId ?? '')
+  const {
+    mutate: uploadImage,
+    isPending: isUploadingImage,
+    isError: isUploadError,
+    isSuccess: isUploadSuccess,
+  } = useUploadItemImage(listId ?? '')
   const { data: listDetail } = useListDetail(listId ?? '')
   const { data: options, isLoading: optionsLoading } = useOptions(itemId ?? '')
   const { mutate: handleAddOption, isPending: isAdding, error: addError } = useCreateOption(itemId ?? '')
@@ -61,6 +73,19 @@ const ItemDetailPage = () => {
     )
   }
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    const result = itemImageSchema.safeParse(file)
+    if (!result.success) {
+      setImageValidationError(result.error.issues[0]?.message ?? null)
+      return
+    }
+    setImageValidationError(null)
+    uploadImage({ itemId, file: result.data })
+  }
+
   const handlePurchaseSuccess = () => {
     setIsPurchaserModalOpen(false)
     navigate(ROUTES.ITEM_LIST_WITH_ID(listId))
@@ -78,6 +103,9 @@ const ItemDetailPage = () => {
     ? approvedClaimantIds
     : currentUserId ? [currentUserId] : []
   const purchaserNames = item.purchasers.map((p) => p.displayName).join(', ')
+  const imageErrorMessage = imageValidationError
+    ?? (isUploadError ? 'Görsel yüklenemedi. Lütfen tekrar deneyin.' : null)
+    ?? (isImageUploadFailed && !isUploadSuccess ? 'Ürün oluşturuldu ancak görsel yüklenemedi. Buradan tekrar deneyebilirsiniz.' : null)
 
   return (
     <div className={styles.page}>
@@ -95,9 +123,32 @@ const ItemDetailPage = () => {
           <h1 className={styles.title}>{item.name}</h1>
 
           <div className={styles.imageWrapper}>
-            <span className={styles.imagePlaceholder}>
-              {getCategoryIcon(item.categoryName)}
-            </span>
+            {item.imageUrl ? (
+              <img src={item.imageUrl} alt={item.name} className={styles.image} />
+            ) : (
+              <span className={styles.imagePlaceholder}>
+                {getCategoryIcon(item.categoryName)}
+              </span>
+            )}
+            {canEdit && (
+              <>
+                <button
+                  type="button"
+                  className={styles.changeImageBtn}
+                  onClick={() => imageInputRef.current?.click()}
+                  disabled={isUploadingImage}
+                >
+                  {isUploadingImage ? 'Yükleniyor…' : item.imageUrl ? 'Görseli Değiştir' : 'Görsel Ekle'}
+                </button>
+                <input
+                  ref={imageInputRef}
+                  type="file"
+                  accept={IMAGE_INPUT_ACCEPT}
+                  className={styles.hiddenInput}
+                  onChange={handleImageChange}
+                />
+              </>
+            )}
             <div className={styles.imageTags}>
               <span className={styles.imageTag}>{item.categoryName.toUpperCase()}</span>
               {item.status === 'Purchased' && (
@@ -105,6 +156,8 @@ const ItemDetailPage = () => {
               )}
             </div>
           </div>
+
+          {imageErrorMessage && <p className={styles.imageError}>{imageErrorMessage}</p>}
 
           <h2 className={styles.sectionTitle}>Seçenekler</h2>
 

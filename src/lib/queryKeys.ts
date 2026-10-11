@@ -7,6 +7,8 @@ export const QUERY_KEYS = {
   LIST_DETAIL: (id: string) => ['lists', id] as const,
 
   // Items
+  // Prefix of every ITEMS(listId, status) key
+  ITEMS_BY_LIST: (listId: string) => ['items', listId] as const,
   ITEMS: (listId: string, status: string) => ['items', listId, status] as const,
   ITEM_DETAIL: (itemId: string) => ['item', itemId] as const,
 

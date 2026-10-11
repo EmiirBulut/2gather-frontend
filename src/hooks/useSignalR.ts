@@ -26,6 +26,12 @@ interface ItemPurchasedPayload {
   purchasedAt: string
 }
 
+interface ItemImageUpdatedPayload {
+  listId: string
+  itemId: string
+  imageUrl: string
+}
+
 interface ItemDeletedPayload {
   listId: string
   itemId: string
@@ -201,6 +207,14 @@ export function useSignalR(): void {
             (old) => old?.filter((i) => i.id !== itemId)
           )
         }
+      })
+    )
+
+    offs.push(
+      onEvent<ItemImageUpdatedPayload>('ItemImageUpdated', ({ listId, itemId }) => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEM_DETAIL(itemId) })
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEMS_BY_LIST(listId) })
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REPORTS(listId) })
       })
     )
 
