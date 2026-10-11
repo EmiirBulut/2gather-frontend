@@ -1,0 +1,124 @@
+.tableWrapper {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.tableHead {
+  display: grid;
+  grid-template-columns: 56px 1fr 140px 130px 150px 130px;
+  gap: 0;
+  padding: 12px 20px;
+  background: var(--color-bg-tag);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tableHead span {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.tableRow {
+  display: grid;
+  grid-template-columns: 56px 1fr 140px 130px 150px 130px;
+  gap: 0;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--color-border);
+  align-items: center;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.tableRow:last-child {
+  border-bottom: none;
+}
+
+.tableRow:hover {
+  background: var(--color-bg-tag);
+}
+
+.colImage {
+  display: flex;
+  align-items: center;
+}
+
+.itemEmoji {
+  font-size: 22px;
+}
+
+.colName {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-right: 16px;
+}
+
+.itemName {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.itemSub {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.colCategory {
+  display: flex;
+  align-items: center;
+}
+
+.categoryBadge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-tag);
+  color: var(--color-text-secondary);
+}
+
+.colPrice {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+}
+
+.colStatus {
+  display: flex;
+  align-items: center;
+}
+
+.colPurchasers {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  padding-right: var(--space-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.statusBadge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: var(--radius-md);
+}
+
+.statusPurchased {
+  background: var(--color-status-purchased-bg);
+  color: var(--color-status-purchased);
+}
+
+.statusPending {
+  background: var(--color-status-pending-bg);
+  color: var(--color-status-pending);
+}

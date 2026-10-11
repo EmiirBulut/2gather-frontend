@@ -1,20 +1,35 @@
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useReportsSummary, useCategoryReport, useReportItems } from '@/features/reports/hooks/useReports'
 import { useListDetail } from '@/features/lists/hooks/useListDetail'
 import { Breadcrumb } from '@/components/layout/Breadcrumb'
 import SegmentedProgressBar from '@/components/ui/SegmentedProgressBar'
+import ReportFilters from '@/features/reports/components/ReportFilters'
+import ReportItemTable from '@/features/reports/components/ReportItemTable'
+import { useDebouncedValue } from '@/hooks/useDebouncedValue'
+import type { ReportItemDto } from '@/features/reports/types'
+import type { StatusFilter } from '@/features/items/types'
 import { formatPrice } from '@/lib/formatters'
 import { ROUTES } from '@/router/routes'
 import styles from './ReportsPage.module.css'
 
-const CATEGORY_ICON: Record<string, string> = {
-  salon: '🛋️',
-  'yatak odası': '🛏️',
-  mutfak: '🍳',
-  banyo: '🚿',
-  'çocuk odası': '🧸',
+interface ReportItemFilters {
+  status: StatusFilter
+  categoryId: string | null
+  search: string
 }
-const getCategoryIcon = (name: string) => CATEGORY_ICON[name.toLowerCase()] ?? '📦'
+
+const filterReportItems = (
+  items: ReportItemDto[],
+  { status, categoryId, search }: ReportItemFilters
+): ReportItemDto[] => {
+  const query = search.trim().toLocaleLowerCase('tr-TR')
+  return items.filter((item) =>
+    (status === 'All' || item.status === status) &&
+    (categoryId === null || item.categoryId === categoryId) &&
+    (query === '' || item.name.toLocaleLowerCase('tr-TR').includes(query))
+  )
+}
 
 const HomeIcon = () => (
   <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
@@ -33,6 +48,11 @@ const ReportsPage = () => {
   const { data: categories, isLoading: isCatLoading, isError: isCatError } = useCategoryReport(listId ?? '')
   const { data: items, isLoading: isItemsLoading, isError: isItemsError } = useReportItems(listId ?? '')
 
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('All')
+  const [categoryFilter, setCategoryFilter] = useState<string | null>(null)
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebouncedValue(search, 300)
+
   if (!listId) {
     navigate(ROUTES.LISTS)
     return null
@@ -49,6 +69,12 @@ const ReportsPage = () => {
     : 0
 
   const remaining = summary ? summary.estimatedTotal - summary.totalSpent : 0
+
+  const filteredItems = filterReportItems(items ?? [], {
+    status: statusFilter,
+    categoryId: categoryFilter,
+    search: debouncedSearch,
+  })
 
   return (
     <div className={styles.page}>
@@ -162,47 +188,23 @@ const ReportsPage = () => {
         {isItemsLoading ? (
           <div className={styles.skeleton} style={{ height: 200 }} />
         ) : items && items.length > 0 ? (
-          <div className={styles.tableWrapper}>
-            <div className={styles.tableHead}>
-              <span className={styles.colImage}>GÖRSEL</span>
-              <span className={styles.colName}>İTEM ADI</span>
-              <span className={styles.colCategory}>KATEGORİ</span>
-              <span className={styles.colPrice}>FİYAT</span>
-              <span className={styles.colPurchasers}>SATIN ALAN</span>
-              <span className={styles.colStatus}>DURUM</span>
-            </div>
-            {items.map((item) => (
-              <div
-                key={item.id}
-                className={styles.tableRow}
-                onClick={() => navigate(ROUTES.ITEM_DETAIL_WITH_ID(listId, item.id))}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && navigate(ROUTES.ITEM_DETAIL_WITH_ID(listId, item.id))}
-              >
-                <span className={styles.colImage}>
-                  <span className={styles.itemEmoji}>{getCategoryIcon(item.categoryName)}</span>
-                </span>
-                <span className={styles.colName}>
-                  <span className={styles.itemName}>{item.name}</span>
-                  <span className={styles.itemSub}>{item.optionsCount} seçenek</span>
-                </span>
-                <span className={styles.colCategory}>
-                  <span className={styles.categoryBadge}>{item.categoryName}</span>
-                </span>
-                <span className={styles.colPrice}>{formatPrice(item.estimatedPrice)}</span>
-                <span className={styles.colPurchasers}>
-                  {item.purchasers.length > 0 ? item.purchasers.map((p) => p.displayName).join(', ') : '—'}
-                </span>
-                <span className={styles.colStatus}>
-                  <span className={`${styles.statusBadge} ${item.status === 'Purchased' ? styles.statusPurchased : styles.statusPending}`}>
-                    {item.status === 'Purchased' ? 'Satın Alındı' : 'Bekliyor'}
-                  </span>
-                </span>
-              </div>
-            ))}
-          </div>
-        ) : !isItemsLoading && (
+          <>
+            <ReportFilters
+              listId={listId}
+              status={statusFilter}
+              categoryId={categoryFilter}
+              search={search}
+              onStatusChange={setStatusFilter}
+              onCategoryChange={setCategoryFilter}
+              onSearchChange={setSearch}
+            />
+            {filteredItems.length > 0 ? (
+              <ReportItemTable listId={listId} items={filteredItems} />
+            ) : (
+              <p className={styles.emptyText}>Filtrelere uygun ürün bulunamadı.</p>
+            )}
+          </>
+        ) : !isItemsError && (
           <p className={styles.emptyText}>Henüz ürün eklenmemiş.</p>
         )}
       </div>
