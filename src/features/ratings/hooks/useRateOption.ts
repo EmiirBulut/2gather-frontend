@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useInvalidateListData } from '@/hooks/useInvalidateListData'
 import { rateOption } from '../api/ratingsApi'
 import { QUERY_KEYS } from '@/lib/queryKeys'
 import { normalizeError, type ApiError } from '@/services/api'
@@ -16,6 +17,7 @@ interface Context {
 
 export function useRateOption(itemId: string) {
   const queryClient = useQueryClient()
+  const invalidateListData = useInvalidateListData()
 
   return useMutation<OptionRatingSummary, ApiError, Variables, Context>({
     mutationFn: ({ optionId, score }) => rateOption(optionId, score),
@@ -48,6 +50,7 @@ export function useRateOption(itemId: string) {
     },
 
     onSuccess: (summary, { optionId }) => {
+      invalidateListData()
       queryClient.setQueryData<ItemOptionDto[]>(
         QUERY_KEYS.OPTIONS(itemId),
         (old) =>

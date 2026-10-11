@@ -4,6 +4,7 @@ import { connect, disconnect, joinList, leaveList, onEvent } from '@/services/si
 import { useAuthStore } from '@/store/authStore'
 import { useListStore } from '@/store/listStore'
 import { QUERY_KEYS } from '@/lib/queryKeys'
+import { invalidateListAggregates as invalidateListAggregatesFor } from '@/lib/listCache'
 import type { BackendItemDto, ItemDto } from '@/features/items/types'
 import type { ItemOptionDto } from '@/features/options/types'
 import type { MemberDto } from '@/features/members/types'
@@ -162,12 +163,7 @@ export function useSignalR(): void {
 
     const offs: Array<() => void> = []
 
-    // Budget totals, reports and item card prices depend on items and option prices/decisions
-    const invalidateListAggregates = (listId: string) => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEMS_BY_LIST(listId) })
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LIST_DETAIL(listId) })
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REPORTS(listId) })
-    }
+    const invalidateListAggregates = (listId: string) => invalidateListAggregatesFor(queryClient, listId)
 
     // ── Items ──────────────────────────────────────────────────────────────
 

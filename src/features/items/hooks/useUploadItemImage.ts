@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { uploadItemImage } from '../api/itemsApi'
 import { compressImage } from '@/lib/images'
 import { QUERY_KEYS } from '@/lib/queryKeys'
+import { invalidateListAggregates } from '@/lib/listCache'
 import { normalizeError, type ApiError } from '@/services/api'
 import type { UploadItemImageResponse } from '../types'
 
@@ -23,8 +24,7 @@ export function useUploadItemImage(listId: string) {
     },
     onSuccess: (_data, { itemId }) => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEM_DETAIL(itemId) })
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEMS_BY_LIST(listId) })
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REPORTS(listId) })
+      invalidateListAggregates(queryClient, listId)
     },
   })
 }
