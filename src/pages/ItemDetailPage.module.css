@@ -266,3 +266,8 @@
   color: var(--color-status-purchased);
   border-color: var(--color-status-purchased);
 }
+
+.stateText {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}

@@ -1,15 +1,15 @@
 import { useState } from 'react'
-import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useOptions } from '@/features/options/hooks/useOptions'
 import { useCreateOption } from '@/features/options/hooks/useCreateOption'
 import { useMarkPurchased } from '@/features/items/hooks/useMarkPurchased'
+import { useItemDetail } from '@/features/items/hooks/useItemDetail'
 import { usePermission } from '@/hooks/usePermission'
 import { useListDetail } from '@/features/lists/hooks/useListDetail'
 import { Breadcrumb } from '@/components/layout/Breadcrumb'
 import OptionCard from '@/features/options/components/OptionCard'
 import OptionForm from '@/features/options/components/OptionForm'
 import { ROUTES } from '@/router/routes'
-import type { ItemDto } from '@/features/items/types'
 import type { CreateOptionRequest } from '@/features/options/types'
 import styles from './ItemDetailPage.module.css'
 
@@ -25,12 +25,11 @@ const getCategoryIcon = (name: string) => CATEGORY_ICON[name.toLowerCase()] ?? '
 const ItemDetailPage = () => {
   const { listId, itemId } = useParams<{ listId: string; itemId: string }>()
   const navigate = useNavigate()
-  const location = useLocation()
-  const item = location.state?.item as ItemDto | undefined
 
   const [isAddingOption, setIsAddingOption] = useState(false)
 
   const { canEdit, isOwner } = usePermission(listId ?? '')
+  const { data: item, isLoading: isItemLoading, isError: isItemError } = useItemDetail(itemId ?? '')
   const { data: listDetail } = useListDetail(listId ?? '')
   const { data: options, isLoading: optionsLoading } = useOptions(itemId ?? '')
   const { mutate: handleAddOption, isPending: isAdding, error: addError } = useCreateOption(itemId ?? '')
@@ -41,9 +40,16 @@ const ItemDetailPage = () => {
     return null
   }
 
-  if (!item) {
-    navigate(ROUTES.ITEM_LIST_WITH_ID(listId))
-    return null
+  if (isItemLoading) {
+    return <div className={styles.page}><p className={styles.stateText}>Yükleniyor…</p></div>
+  }
+
+  if (isItemError || !item) {
+    return (
+      <div className={styles.page}>
+        <p className={styles.stateText}>Ürün bilgisi yüklenemedi.</p>
+      </div>
+    )
   }
 
   const handleAddOptionSubmit = (data: Omit<CreateOptionRequest, 'itemId'>) => {

@@ -54,8 +54,9 @@ const OptionCard = ({ option, canEdit, isOwner, isPurchased }: Props) => {
   }
 
   const hasDetails = !!(option.notes || option.brand || option.model || option.color)
-  // Non-owner cannot edit/delete a finalized option
-  const canMutate = canEdit && !(option.isFinal && !isOwner)
+  // Purchased items are locked; non-owner cannot edit/delete a finalized option
+  const canMutate = canEdit && !isPurchased && !(option.isFinal && !isOwner)
+  const canChangeFinalDecision = isOwner && !isPurchased
 
   return (
     <div className={`${styles.card} ${option.isSelected ? styles.isSelected : ''} ${option.isFinal ? styles.isFinal : ''}`}>
@@ -165,8 +166,8 @@ const OptionCard = ({ option, canEdit, isOwner, isPurchased }: Props) => {
         )}
       </div>
 
-      {/* Final decision button (owner only) */}
-      {isOwner && (
+      {/* Final decision button (owner only, locked once purchased) */}
+      {canChangeFinalDecision && (
         <div className={styles.finalRow}>
           {option.isFinal ? (
             <button

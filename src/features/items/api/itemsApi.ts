@@ -1,8 +1,21 @@
 import { apiClient } from '@/services/api'
 import { getCategories } from '@/features/categories/api/categoriesApi'
-import type { BackendItemDto, CreateItemRequest, ItemDto, StatusFilter } from '../types'
+import type {
+  BackendItemDetailDto,
+  BackendItemDto,
+  BackendItemStatus,
+  CreateItemRequest,
+  ItemDetailDto,
+  ItemDto,
+  ItemStatus,
+  StatusFilter,
+} from '../types'
 
 // ─── Adapter ─────────────────────────────────────────────────────────────────
+
+function toItemStatus(status: BackendItemStatus): ItemStatus {
+  return status === 0 ? 'Pending' : 'Purchased'
+}
 
 function toItemDto(raw: BackendItemDto, categoryMap: Map<string, string>): ItemDto {
   return {
@@ -11,7 +24,7 @@ function toItemDto(raw: BackendItemDto, categoryMap: Map<string, string>): ItemD
     categoryId: raw.categoryId,
     categoryName: categoryMap.get(raw.categoryId) ?? raw.categoryId,
     name: raw.name,
-    status: raw.status === 0 ? 'Pending' : 'Purchased',
+    status: toItemStatus(raw.status),
     purchasedAt: raw.purchasedAt,
     optionsCount: raw.optionsCount,
     createdAt: raw.createdAt,
@@ -31,6 +44,11 @@ export async function getItems(
   ])
   const categoryMap = new Map(categories.map((c) => [c.id, c.name]))
   return itemsResponse.data.map((item) => toItemDto(item, categoryMap))
+}
+
+export async function getItemDetail(itemId: string): Promise<ItemDetailDto> {
+  const response = await apiClient.get<BackendItemDetailDto>(`/api/items/${itemId}`)
+  return { ...response.data, status: toItemStatus(response.data.status) }
 }
 
 export async function createItem(data: CreateItemRequest): Promise<ItemDto> {

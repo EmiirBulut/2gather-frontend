@@ -175,10 +175,10 @@ const ReportsPage = () => {
               <div
                 key={item.id}
                 className={styles.tableRow}
-                onClick={() => navigate(ROUTES.ITEM_DETAIL_WITH_ID(listId, item.id), { state: { item } })}
+                onClick={() => navigate(ROUTES.ITEM_DETAIL_WITH_ID(listId, item.id))}
                 role="button"
                 tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && navigate(ROUTES.ITEM_DETAIL_WITH_ID(listId, item.id), { state: { item } })}
+                onKeyDown={(e) => e.key === 'Enter' && navigate(ROUTES.ITEM_DETAIL_WITH_ID(listId, item.id))}
               >
                 <span className={styles.colImage}>
                   <span className={styles.itemEmoji}>{getCategoryIcon(item.categoryName)}</span>

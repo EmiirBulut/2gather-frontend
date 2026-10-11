@@ -8,6 +8,7 @@ export const QUERY_KEYS = {
 
   // Items
   ITEMS: (listId: string, status: string) => ['items', listId, status] as const,
+  ITEM_DETAIL: (itemId: string) => ['item', itemId] as const,
 
   // Options
   OPTIONS: (itemId: string) => ['options', itemId] as const,

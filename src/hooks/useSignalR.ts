@@ -141,6 +141,7 @@ export function useSignalR(): void {
 
     offs.push(
       onEvent<ItemUpdatedPayload>('ItemUpdated', ({ listId, item }) => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEM_DETAIL(item.id) })
         for (const status of ['Pending', 'Purchased', 'All'] as const) {
           queryClient.setQueryData<ItemDto[]>(
             QUERY_KEYS.ITEMS(listId, status),
@@ -152,6 +153,7 @@ export function useSignalR(): void {
 
     offs.push(
       onEvent<ItemPurchasedPayload>('ItemPurchased', ({ listId, itemId, purchasedAt }) => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEM_DETAIL(itemId) })
         // Remove from Pending, update in Purchased + All
         queryClient.setQueryData<ItemDto[]>(
           QUERY_KEYS.ITEMS(listId, 'Pending'),

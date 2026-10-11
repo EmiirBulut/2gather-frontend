@@ -46,7 +46,8 @@ export function useMarkPurchased() {
       }
     },
 
-    onSettled: (_data, _err, { listId }) => {
+    onSettled: (_data, _err, { itemId, listId }) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEM_DETAIL(itemId) })
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEMS(listId, 'Pending') })
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEMS(listId, 'Purchased') })
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEMS(listId, 'All') })

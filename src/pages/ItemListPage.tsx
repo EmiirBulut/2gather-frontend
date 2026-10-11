@@ -156,10 +156,10 @@ const ItemListPage = () => {
                 <div
                   key={item.id}
                   className={styles.card}
-                  onClick={() => navigate(ROUTES.ITEM_DETAIL_WITH_ID(listId, item.id), { state: { item } })}
+                  onClick={() => navigate(ROUTES.ITEM_DETAIL_WITH_ID(listId, item.id))}
                   role="button"
                   tabIndex={0}
-                  onKeyDown={(e) => e.key === 'Enter' && navigate(ROUTES.ITEM_DETAIL_WITH_ID(listId, item.id), { state: { item } })}
+                  onKeyDown={(e) => e.key === 'Enter' && navigate(ROUTES.ITEM_DETAIL_WITH_ID(listId, item.id))}
                 >
                   <div className={styles.cardImage}>
                     <span className={styles.cardImagePlaceholder}>
