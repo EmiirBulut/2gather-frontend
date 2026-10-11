@@ -151,10 +151,15 @@ export const Sidebar = () => {
       </nav>
 
       <div className={styles.bottom}>
-        <a className={styles.settingsItem}>
+        <NavLink
+          to={listId ? ROUTES.LIST_SETTINGS_WITH_ID(listId) : ROUTES.SETTINGS}
+          className={({ isActive }) =>
+            `${styles.settingsItem} ${isActive ? styles.navItemActive : ''}`
+          }
+        >
           <SettingsIcon />
           Ayarlar
-        </a>
+        </NavLink>
         <button className={styles.logoutItem} onClick={handleLogout}>
           <LogoutIcon />
           Çıkış Yap

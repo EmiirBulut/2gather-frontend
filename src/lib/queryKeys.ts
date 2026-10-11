@@ -15,6 +15,9 @@ export const QUERY_KEYS = {
   // Options
   OPTIONS: (itemId: string) => ['options', itemId] as const,
 
+  // Current user
+  CURRENT_USER: ['users', 'me'] as const,
+
   // Members
   MEMBERS: (listId: string) => ['members', listId] as const,
 

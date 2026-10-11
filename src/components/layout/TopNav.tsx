@@ -34,7 +34,9 @@ export const TopNav = () => {
             <path d="M8.5 16.5a1.5 1.5 0 003 0" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
           </svg>
         </button>
-        <div className={styles.avatar}>{initials}</div>
+        <NavLink to={ROUTES.SETTINGS} className={styles.avatar} aria-label="Ayarlar" title="Ayarlar">
+          {initials}
+        </NavLink>
       </div>
     </header>
   )

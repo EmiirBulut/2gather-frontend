@@ -18,6 +18,7 @@ const ItemDetailPage = lazy(() => import('@/pages/ItemDetailPage'))
 const ReportsPage = lazy(() => import('@/pages/ReportsPage'))
 const MembersPage = lazy(() => import('@/pages/MembersPage'))
 const NewItemPage = lazy(() => import('@/pages/NewItemPage'))
+const SettingsPage = lazy(() => import('@/pages/SettingsPage'))
 
 // ─── Suspense Fallback ────────────────────────────────────────────────────────
 
@@ -63,6 +64,7 @@ export const router = createBrowserRouter([
         element: <TopNavLayout />,
         children: [
           { path: ROUTES.LISTS, element: withSuspense(<ListSelectorPage />) },
+          { path: ROUTES.SETTINGS, element: withSuspense(<SettingsPage />) },
         ],
       },
       {
@@ -74,6 +76,7 @@ export const router = createBrowserRouter([
           { path: ROUTES.ITEM_DETAIL, element: withSuspense(<ItemDetailPage />) },
           { path: ROUTES.REPORTS, element: withSuspense(<ReportsPage />) },
           { path: ROUTES.MEMBERS, element: withSuspense(<MembersPage />) },
+          { path: ROUTES.LIST_SETTINGS, element: withSuspense(<SettingsPage />) },
         ],
       },
     ],

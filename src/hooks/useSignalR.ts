@@ -32,6 +32,11 @@ interface ItemImageUpdatedPayload {
   imageUrl: string
 }
 
+interface ListUpdatedPayload {
+  listId: string
+  name: string
+}
+
 interface InviteStatusChangedPayload {
   listId: string
   inviteId: string
@@ -292,6 +297,15 @@ export function useSignalR(): void {
       onEvent<ClaimReviewedPayload>('ClaimReviewed', ({ optionId, itemId }) => {
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.OPTIONS(itemId) })
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CLAIMS(optionId) })
+      })
+    )
+
+    // ── List ───────────────────────────────────────────────────────────────
+
+    offs.push(
+      onEvent<ListUpdatedPayload>('ListUpdated', ({ listId }) => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LIST_DETAIL(listId) })
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LISTS, exact: true })
       })
     )
 

@@ -84,4 +84,5 @@
   font-weight: 600;
   color: var(--color-primary);
   cursor: pointer;
+  text-decoration: none;
 }
