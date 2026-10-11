@@ -33,6 +33,7 @@ function toItemDto(raw: BackendItemDto, categoryMap: Map<string, string>): ItemD
     optionsCount: raw.optionsCount,
     createdAt: raw.createdAt,
     updatedAt: raw.updatedAt,
+    effectivePrice: raw.effectivePrice,
   }
 }
 

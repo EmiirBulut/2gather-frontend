@@ -147,8 +147,9 @@ export function useSignalR(): void {
 
     const offs: Array<() => void> = []
 
-    // Budget totals and reports depend on items and option prices/decisions
+    // Budget totals, reports and item card prices depend on items and option prices/decisions
     const invalidateListAggregates = (listId: string) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEMS_BY_LIST(listId) })
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LIST_DETAIL(listId) })
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REPORTS(listId) })
     }
@@ -241,12 +242,11 @@ export function useSignalR(): void {
     )
 
     offs.push(
-      onEvent<OptionUpdatedPayload>('OptionUpdated', ({ listId, itemId, option }) => {
+      onEvent<OptionUpdatedPayload>('OptionUpdated', ({ listId, itemId }) => {
         invalidateListAggregates(listId)
-        queryClient.setQueryData<ItemOptionDto[]>(
-          QUERY_KEYS.OPTIONS(itemId),
-          (old) => old?.map((o) => (o.id === option.id ? option : o))
-        )
+        // Refetch instead of patching: selecting one option also unselects the others,
+        // and the event payload does not carry ratings or claims
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.OPTIONS(itemId) })
       })
     )
 

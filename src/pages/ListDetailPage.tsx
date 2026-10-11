@@ -3,8 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useItems } from '@/features/items/hooks/useItems'
 import { useListDetail } from '@/features/lists/hooks/useListDetail'
 import { useCategories } from '@/features/categories/hooks/useCategories'
-import { useListStore } from '@/store/listStore'
-import { useSignalR } from '@/hooks/useSignalR'
 import { ROUTES } from '@/router/routes'
 import { formatPrice } from '@/lib/formatters'
 import styles from './ListDetailPage.module.css'
@@ -38,14 +36,10 @@ const FinancialIcon = () => (
 const ListDetailPage = () => {
   const { listId } = useParams<{ listId: string }>()
   const navigate = useNavigate()
-  const setActiveListId = useListStore((s) => s.setActiveListId)
-  if (listId) setActiveListId(listId)
 
   const { data: listDetail } = useListDetail(listId ?? '')
   const { data: allItems, isLoading: itemsLoading } = useItems(listId ?? '', 'All')
   const { data: categories, isLoading: catsLoading } = useCategories(listId ?? '')
-
-  useSignalR()
 
   const totalCount = allItems?.length ?? 0
   const purchasedCount = allItems?.filter((i) => i.status === 'Purchased').length ?? 0

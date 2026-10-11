@@ -20,6 +20,8 @@ export interface BackendItemDto {
   optionsCount: number
   createdAt: string
   updatedAt: string
+  // final > selected > most expensive option; null when no option has a price
+  effectivePrice: number | null
 }
 
 export interface ItemDto {
@@ -35,6 +37,7 @@ export interface ItemDto {
   optionsCount: number
   createdAt: string
   updatedAt: string
+  effectivePrice: number | null
 }
 
 // GET /api/items/:itemId — mirrors backend ItemDetailDto
