@@ -4,20 +4,21 @@ import { connect, disconnect, joinList, leaveList, onEvent } from '@/services/si
 import { useAuthStore } from '@/store/authStore'
 import { useListStore } from '@/store/listStore'
 import { QUERY_KEYS } from '@/lib/queryKeys'
-import type { ItemDto } from '@/features/items/types'
+import type { BackendItemDto, ItemDto } from '@/features/items/types'
 import type { ItemOptionDto } from '@/features/options/types'
 import type { MemberDto } from '@/features/members/types'
 
 // ─── SignalR event payload shapes ────────────────────────────────────────────
 
+// Raw backend ItemDto; only the id is read (lists are refetched to get the adapted shape)
 interface ItemAddedPayload {
   listId: string
-  item: ItemDto
+  item: Pick<BackendItemDto, 'id'>
 }
 
 interface ItemUpdatedPayload {
   listId: string
-  item: ItemDto
+  item: Pick<BackendItemDto, 'id'>
 }
 
 interface ItemPurchasedPayload {
@@ -166,14 +167,10 @@ export function useSignalR(): void {
     // ── Items ──────────────────────────────────────────────────────────────
 
     offs.push(
-      onEvent<ItemAddedPayload>('ItemAdded', ({ listId, item }) => {
+      // The payload is the backend's raw ItemDto (numeric status, no categoryName),
+      // so refetch the adapted lists instead of inserting it into the cache
+      onEvent<ItemAddedPayload>('ItemAdded', ({ listId }) => {
         invalidateListAggregates(listId)
-        for (const status of ['Pending', 'All'] as const) {
-          queryClient.setQueryData<ItemDto[]>(
-            QUERY_KEYS.ITEMS(listId, status),
-            (old) => (old ? [...old, item] : [item])
-          )
-        }
       })
     )
 
@@ -181,12 +178,6 @@ export function useSignalR(): void {
       onEvent<ItemUpdatedPayload>('ItemUpdated', ({ listId, item }) => {
         invalidateListAggregates(listId)
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEM_DETAIL(item.id) })
-        for (const status of ['Pending', 'Purchased', 'All'] as const) {
-          queryClient.setQueryData<ItemDto[]>(
-            QUERY_KEYS.ITEMS(listId, status),
-            (old) => old?.map((i) => (i.id === item.id ? item : i))
-          )
-        }
       })
     )
 

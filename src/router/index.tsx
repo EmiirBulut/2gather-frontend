@@ -5,6 +5,7 @@ import ProtectedRoute from './ProtectedRoute'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { TopNavLayout } from '@/components/layout/TopNavLayout'
 import { AuthLayout } from '@/components/layout/AuthLayout'
+import RouteErrorPage from '@/pages/RouteErrorPage'
 
 // ─── Lazy Page Imports ────────────────────────────────────────────────────────
 
@@ -49,6 +50,7 @@ export const router = createBrowserRouter([
   // Auth layout routes
   {
     element: <AuthLayout />,
+    errorElement: <RouteErrorPage />,
     children: [
       { path: ROUTES.LOGIN, element: withSuspense(<LoginPage />) },
       { path: ROUTES.REGISTER, element: withSuspense(<RegisterPage />) },
@@ -59,6 +61,7 @@ export const router = createBrowserRouter([
   // Protected — TopNavLayout (list selector)
   {
     element: <ProtectedRoute />,
+    errorElement: <RouteErrorPage />,
     children: [
       {
         element: <TopNavLayout />,
