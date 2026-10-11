@@ -9,6 +9,8 @@ export const queryClient = new QueryClient({
     },
     mutations: {
       retry: 0,
+      // Fail immediately when offline (instead of pausing) so forms can show the offline warning
+      networkMode: 'always',
     },
   },
 })

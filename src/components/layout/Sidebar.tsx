@@ -5,6 +5,7 @@ import { useAuthStore } from '@/store/authStore'
 import { getListDetail } from '@/features/lists/api/listsApi'
 import { QUERY_KEYS } from '@/lib/queryKeys'
 import InstallAppButton from '@/components/ui/InstallAppButton'
+import OfflineIndicator from '@/components/ui/OfflineIndicator'
 import styles from './Sidebar.module.css'
 
 const HomeIcon = () => (
@@ -81,6 +82,9 @@ export const Sidebar = () => {
       <div className={styles.logo}>
         <div className={styles.logoName}>2gather</div>
         <div className={styles.logoTagline}>Birlikte Planlayın</div>
+        <div className={styles.offlineSlot}>
+          <OfflineIndicator />
+        </div>
       </div>
 
       <nav className={styles.nav}>

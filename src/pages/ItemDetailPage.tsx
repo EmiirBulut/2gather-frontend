@@ -5,6 +5,7 @@ import { useCreateOption } from '@/features/options/hooks/useCreateOption'
 import { useItemDetail } from '@/features/items/hooks/useItemDetail'
 import { useUploadItemImage } from '@/features/items/hooks/useUploadItemImage'
 import { IMAGE_INPUT_ACCEPT, itemImageSchema } from '@/lib/images'
+import { getErrorMessage } from '@/services/api'
 import { usePermission } from '@/hooks/usePermission'
 import { useListDetail } from '@/features/lists/hooks/useListDetail'
 import { Breadcrumb } from '@/components/layout/Breadcrumb'
@@ -42,7 +43,7 @@ const ItemDetailPage = () => {
   const {
     mutate: uploadImage,
     isPending: isUploadingImage,
-    isError: isUploadError,
+    error: uploadError,
     isSuccess: isUploadSuccess,
   } = useUploadItemImage(listId ?? '')
   const { data: listDetail } = useListDetail(listId ?? '')
@@ -104,7 +105,7 @@ const ItemDetailPage = () => {
     : currentUserId ? [currentUserId] : []
   const purchaserNames = item.purchasers.map((p) => p.displayName).join(', ')
   const imageErrorMessage = imageValidationError
-    ?? (isUploadError ? 'Görsel yüklenemedi. Lütfen tekrar deneyin.' : null)
+    ?? getErrorMessage(uploadError, 'Görsel yüklenemedi. Lütfen tekrar deneyin.')
     ?? (isImageUploadFailed && !isUploadSuccess ? 'Ürün oluşturuldu ancak görsel yüklenemedi. Buradan tekrar deneyebilirsiniz.' : null)
 
   return (

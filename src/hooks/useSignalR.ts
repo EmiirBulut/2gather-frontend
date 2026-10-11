@@ -118,7 +118,16 @@ export function useSignalR(): void {
       // Connection failure is non-fatal — will retry via auto-reconnect
     })
 
+    // Auto-reconnect only retries a few times; reconnect when the device is back online
+    const handleOnline = () => {
+      connect().catch(() => {
+        // Still unreachable — the next online event or page visit retries
+      })
+    }
+    window.addEventListener('online', handleOnline)
+
     return () => {
+      window.removeEventListener('online', handleOnline)
       disconnect()
     }
   }, [accessToken])

@@ -50,6 +50,13 @@ export async function connect(): Promise<void> {
   if (connection && connection.state !== signalR.HubConnectionState.Disconnected) {
     return startPromise ?? undefined
   }
+  if (connection) {
+    // Automatic reconnect gave up (e.g. a long offline period): restart the same
+    // connection so the event handlers registered on it keep working
+    startPromise = connection.start().then(joinDesiredList)
+    await startPromise
+    return
+  }
   connection = buildConnection()
   connection.onreconnected(() => {
     joinDesiredList().catch(() => {

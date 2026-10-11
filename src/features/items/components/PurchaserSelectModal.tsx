@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import Button from '@/components/ui/Button'
 import { useMembers } from '@/features/members/hooks/useMembers'
 import { useMarkPurchased } from '../hooks/useMarkPurchased'
+import { getErrorMessage } from '@/services/api'
 import styles from './PurchaserSelectModal.module.css'
 
 const schema = z.object({
@@ -40,7 +41,7 @@ const PurchaserSelectModal = ({ listId, itemId, defaultPurchaserIds, onClose, on
   }
 
   // 403 carries a user-facing message from useMarkPurchased; anything else gets a generic one
-  const errorMessage = error ? (error.statusCode === 403 ? error.message : PURCHASE_ERROR) : null
+  const errorMessage = error?.statusCode === 403 ? error.message : getErrorMessage(error, PURCHASE_ERROR)
 
   return (
     <div className={styles.overlay} onClick={handleOverlayClick}>

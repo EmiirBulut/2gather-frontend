@@ -152,9 +152,32 @@ export interface ApiError {
   message: string
   statusCode: number | null
   errors?: Record<string, string[]>
+  // True when the request never reached the server because the device is offline
+  isOffline?: boolean
+}
+
+export const OFFLINE_ERROR_MESSAGE = 'İnternet bağlantısı yok. Bağlantı kurulunca tekrar dene.'
+const SERVER_UNREACHABLE_MESSAGE = 'Sunucuya ulaşılamadı. Lütfen daha sonra tekrar deneyin.'
+
+const isApiError = (error: unknown): error is ApiError =>
+  typeof error === 'object' && error !== null && 'message' in error && 'statusCode' in error
+
+/** Offline errors keep their own message; anything else gets the caller's fallback text. */
+export const getErrorMessage = (error: ApiError | null | undefined, fallback: string): string | null => {
+  if (!error) return null
+  return error.isOffline ? error.message : fallback
 }
 
 export function normalizeError(error: unknown): ApiError {
+  // The response interceptor already normalizes; hooks may normalize again
+  if (isApiError(error)) return error
+
+  if (error instanceof AxiosError && !error.response) {
+    return navigator.onLine
+      ? { message: SERVER_UNREACHABLE_MESSAGE, statusCode: null }
+      : { message: OFFLINE_ERROR_MESSAGE, statusCode: null, isOffline: true }
+  }
+
   if (error instanceof AxiosError) {
     const status = error.response?.status ?? null
     const data = error.response?.data as

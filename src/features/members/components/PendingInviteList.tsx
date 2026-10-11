@@ -1,5 +1,6 @@
 import { usePendingInvites, useCancelInvite, useResendInvite } from '../hooks/useInvites'
 import { formatDateTime } from '@/lib/formatters'
+import { getErrorMessage } from '@/services/api'
 import type { InviteEmailStatus, PendingInviteDto } from '../types'
 import styles from './PendingInviteList.module.css'
 
@@ -35,7 +36,9 @@ interface Props {
 const PendingInviteList = ({ listId }: Props) => {
   const { data: invites, isLoading } = usePendingInvites(listId)
   const { mutate: cancel, isPending: isCancelling } = useCancelInvite(listId)
-  const { mutate: resend, isPending: isResending, isError: isResendError } = useResendInvite(listId)
+  const { mutate: resend, isPending: isResending, error: resendError } = useResendInvite(listId)
+
+  const resendErrorMessage = getErrorMessage(resendError, RESEND_ERROR)
 
   if (isLoading || !invites?.length) return null
 
@@ -89,7 +92,7 @@ const PendingInviteList = ({ listId }: Props) => {
           </div>
         ))}
       </div>
-      {isResendError && <p className={styles.errorText}>{RESEND_ERROR}</p>}
+      {resendErrorMessage && <p className={styles.errorText}>{resendErrorMessage}</p>}
     </div>
   )
 }

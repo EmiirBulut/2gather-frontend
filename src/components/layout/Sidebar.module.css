@@ -224,3 +224,11 @@
 .installSlot:empty {
   display: none;
 }
+
+.offlineSlot {
+  margin-top: var(--space-2);
+}
+
+.offlineSlot:empty {
+  display: none;
+}
