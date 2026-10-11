@@ -50,7 +50,7 @@
   width: 100%;
   padding: 14px;
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-on-primary);
   border-radius: var(--radius-md);
   font-family: var(--font-body);
   font-size: 15px;
@@ -89,7 +89,7 @@
 .googleBtn {
   width: 100%;
   padding: 12px;
-  background: #fff;
+  background: var(--color-bg-card);
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
   font-family: var(--font-body);
@@ -112,7 +112,7 @@
 .serverError {
   font-size: 13px;
   color: var(--color-danger);
-  background: #fef2f2;
+  background: var(--color-danger-bg);
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-sm);
 }

@@ -171,7 +171,7 @@
   font-weight: 600;
   padding: 3px 10px;
   border-radius: var(--radius-full);
-  background: #fef2f2;
+  background: var(--color-danger-bg);
   color: var(--color-danger);
 }
 
@@ -230,7 +230,7 @@
 }
 
 .inspectBtn:hover {
-  background: #d4e4da;
+  background: color-mix(in srgb, var(--color-primary) 16%, var(--color-primary-light));
 }
 
 .emptyClaimsText {
@@ -358,7 +358,7 @@
   bottom: 32px;
   right: 32px;
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-on-primary);
   border: none;
   border-radius: var(--radius-md);
   padding: 14px 20px;

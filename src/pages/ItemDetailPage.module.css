@@ -74,7 +74,7 @@
   font-weight: 600;
   padding: 4px 12px;
   border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.92);
+  background: color-mix(in srgb, var(--color-bg-card) 92%, transparent);
   color: var(--color-text-secondary);
   letter-spacing: 0.04em;
 }
@@ -132,7 +132,7 @@
   width: 100%;
   padding: 10px;
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-on-primary);
   border: none;
   border-radius: var(--radius-md);
   font-family: var(--font-body);

@@ -10,12 +10,12 @@ import { formatPrice } from '@/lib/formatters'
 import styles from './ListDetailPage.module.css'
 
 const CATEGORY_ICONS: Record<string, { icon: string; bg: string }> = {
-  salon: { icon: '🛋️', bg: '#E8F0EA' },
-  'yatak odası': { icon: '🛏️', bg: '#E8EDF5' },
-  mutfak: { icon: '🍳', bg: '#F5E8E8' },
-  banyo: { icon: '🚿', bg: '#E8F5F0' },
-  'çocuk odası': { icon: '🧸', bg: '#F5F0E8' },
-  default: { icon: '📦', bg: '#F0F0EE' },
+  salon: { icon: '🛋️', bg: 'var(--color-category-green)' },
+  'yatak odası': { icon: '🛏️', bg: 'var(--color-category-blue)' },
+  mutfak: { icon: '🍳', bg: 'var(--color-category-red)' },
+  banyo: { icon: '🚿', bg: 'var(--color-category-teal)' },
+  'çocuk odası': { icon: '🧸', bg: 'var(--color-category-sand)' },
+  default: { icon: '📦', bg: 'var(--color-category-neutral)' },
 }
 
 const getCategoryStyle = (name: string) =>

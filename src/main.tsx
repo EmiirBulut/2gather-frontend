@@ -4,7 +4,10 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { RouterProvider } from 'react-router-dom'
 import { router } from '@/router'
 import { queryClient } from '@/lib/queryClient'
+import { initTheme } from '@/lib/theme'
 import '@/assets/styles/globals.css'
+
+initTheme()
 
 const rootElement = document.getElementById('root')
 if (!rootElement) throw new Error('Root element not found')

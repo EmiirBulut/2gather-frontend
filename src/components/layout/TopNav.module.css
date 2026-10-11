@@ -2,7 +2,7 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(245, 243, 238, 0.85);
+  background: color-mix(in srgb, var(--color-bg-page) 85%, transparent);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--color-border);
   padding: 0 40px;
