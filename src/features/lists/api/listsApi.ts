@@ -1,5 +1,5 @@
 import { apiClient } from '@/services/api'
-import type { CreateListRequest, ListDetailDto, ListDetailNormalized, ListSummaryDto } from '../types'
+import type { CreateListRequest, ListDetailDto, ListDetailNormalized, ListSummaryDto, RenameListRequest } from '../types'
 
 // ─── Lists API Functions ──────────────────────────────────────────────────────
 
@@ -20,4 +20,8 @@ export async function createList(data: CreateListRequest): Promise<ListSummaryDt
 
 export async function deleteList(id: string): Promise<void> {
   await apiClient.delete(`/api/lists/${id}`)
+}
+
+export async function renameList(id: string, data: RenameListRequest): Promise<void> {
+  await apiClient.patch(`/api/lists/${id}`, data)
 }

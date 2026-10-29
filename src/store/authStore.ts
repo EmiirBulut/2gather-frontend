@@ -14,6 +14,7 @@ interface AuthState {
   accessToken: string | null
   user: UserDto | null
   setAuth: (token: string, user: UserDto) => void
+  updateUser: (user: UserDto) => void
   clearAuth: () => void
   logout: () => void
 }
@@ -27,6 +28,8 @@ export const useAuthStore = create<AuthState>()(
       user: null,
 
       setAuth: (token, user) => set({ accessToken: token, user }),
+
+      updateUser: (user) => set({ user }),
 
       clearAuth: () => set({ accessToken: null, user: null }),
 

@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useInvalidateListData } from '@/hooks/useInvalidateListData'
 import { reviewClaim } from '../api/claimsApi'
 import { QUERY_KEYS } from '@/lib/queryKeys'
 import { normalizeError, type ApiError } from '@/services/api'
@@ -13,10 +14,12 @@ interface Variables {
 
 export function useReviewClaim(itemId: string) {
   const queryClient = useQueryClient()
+  const invalidateListData = useInvalidateListData()
 
   return useMutation<ClaimDto, ApiError, Variables>({
     mutationFn: ({ claimId, decision }) => reviewClaim(claimId, decision),
     onSuccess: (_data, { optionId }) => {
+      invalidateListData()
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.OPTIONS(itemId) })
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CLAIMS(optionId) })
     },

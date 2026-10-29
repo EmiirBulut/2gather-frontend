@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useInviteMember } from '../hooks/useInvites'
+import { getErrorMessage } from '@/services/api'
 import styles from './InvitePanel.module.css'
 
 const schema = z.object({
@@ -16,7 +17,7 @@ interface Props {
 }
 
 const InvitePanel = ({ listId }: Props) => {
-  const { mutate: invite, isPending, isError } = useInviteMember(listId)
+  const { mutate: invite, isPending, error: inviteError } = useInviteMember(listId)
 
   const {
     register,
@@ -35,6 +36,8 @@ const InvitePanel = ({ listId }: Props) => {
   const handleInvite = (values: FormValues) => {
     invite(values, { onSuccess: () => reset() })
   }
+
+  const inviteErrorMessage = getErrorMessage(inviteError, 'Davet gönderilemedi. Lütfen tekrar deneyin.')
 
   return (
     <div className={styles.panel}>
@@ -77,9 +80,7 @@ const InvitePanel = ({ listId }: Props) => {
           </p>
         </div>
 
-        {isError && (
-          <p className={styles.serverError}>Davet gönderilemedi. Lütfen tekrar deneyin.</p>
-        )}
+        {inviteErrorMessage && <p className={styles.serverError}>{inviteErrorMessage}</p>}
 
         <button type="submit" disabled={isPending} className={styles.submitBtn}>
           {isPending ? 'Gönderiliyor…' : 'Davet Et →'}

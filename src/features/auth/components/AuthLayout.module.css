@@ -19,7 +19,7 @@
 /* ── Sol panel ── */
 .hero {
   flex: 0 0 55%;
-  background: #3D5A4C;
+  background: var(--color-bg-dark-card);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -49,7 +49,7 @@
   font-family: var(--font-display);
   font-size: 20px;
   font-weight: 700;
-  color: #fff;
+  color: var(--color-text-on-dark);
   letter-spacing: -0.02em;
 }
 
@@ -62,7 +62,7 @@
   font-family: var(--font-display);
   font-size: 36px;
   font-weight: 700;
-  color: #fff;
+  color: var(--color-text-on-dark);
   line-height: 1.15;
   letter-spacing: -0.02em;
   margin-bottom: 12px;
@@ -79,7 +79,7 @@
 /* ── Sağ panel ── */
 .formPanel {
   flex: 0 0 45%;
-  background: #fff;
+  background: var(--color-bg-card);
   display: flex;
   align-items: center;
   justify-content: center;

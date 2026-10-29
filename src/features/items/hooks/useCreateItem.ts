@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createItem } from '../api/itemsApi'
-import { QUERY_KEYS } from '@/lib/queryKeys'
+import { invalidateListAggregates } from '@/lib/listCache'
 import { normalizeError, type ApiError } from '@/services/api'
 import type { CreateItemRequest, ItemDto } from '../types'
 
@@ -9,11 +9,7 @@ export function useCreateItem(listId: string) {
 
   return useMutation<ItemDto, ApiError, CreateItemRequest>({
     mutationFn: createItem,
-    onSuccess: () => {
-      // Invalidate both Pending and All views
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEMS(listId, 'Pending') })
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEMS(listId, 'All') })
-    },
+    onSuccess: () => invalidateListAggregates(queryClient, listId),
     onError: (error: unknown) => normalizeError(error),
   })
 }

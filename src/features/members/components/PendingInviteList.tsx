@@ -1,12 +1,32 @@
 import { usePendingInvites, useCancelInvite, useResendInvite } from '../hooks/useInvites'
-import { formatRelativeTime } from '@/lib/formatters'
-import type { PendingInviteDto } from '../types'
+import { formatDateTime } from '@/lib/formatters'
+import { getErrorMessage } from '@/services/api'
+import type { InviteEmailStatus, PendingInviteDto } from '../types'
 import styles from './PendingInviteList.module.css'
 
 const ROLE_LABELS: Record<PendingInviteDto['role'], string> = {
   Owner: 'SAHİP',
   Editor: 'EDİTÖR',
   Viewer: 'İZLEYİCİ',
+}
+
+const EMAIL_STATUS_LABELS: Record<InviteEmailStatus, string> = {
+  Pending: 'Gönderim bekleniyor',
+  Sent: 'Gönderildi',
+  Delivered: 'İletildi',
+  Failed: 'Gönderilemedi',
+  Bounced: 'Teslim edilemedi',
+  Complained: 'Spam bildirildi',
+}
+
+const RESEND_ERROR = 'Davet yeniden gönderilemedi. Lütfen daha sonra tekrar deneyin.'
+
+const buildInviteMeta = ({ isExpired, lastSentAt, createdAt, sendCount, deliveredAt }: PendingInviteDto): string => {
+  if (isExpired) return 'Süresi doldu'
+  const parts = [`Gönderim: ${formatDateTime(lastSentAt ?? createdAt)}`]
+  if (sendCount > 1) parts.push(`${sendCount} kez gönderildi`)
+  if (deliveredAt) parts.push(`İletim: ${formatDateTime(deliveredAt)}`)
+  return parts.join(' · ')
 }
 
 interface Props {
@@ -16,7 +36,9 @@ interface Props {
 const PendingInviteList = ({ listId }: Props) => {
   const { data: invites, isLoading } = usePendingInvites(listId)
   const { mutate: cancel, isPending: isCancelling } = useCancelInvite(listId)
-  const { mutate: resend, isPending: isResending } = useResendInvite(listId)
+  const { mutate: resend, isPending: isResending, error: resendError } = useResendInvite(listId)
+
+  const resendErrorMessage = getErrorMessage(resendError, RESEND_ERROR)
 
   if (isLoading || !invites?.length) return null
 
@@ -35,10 +57,12 @@ const PendingInviteList = ({ listId }: Props) => {
 
             <div className={styles.info}>
               <span className={styles.email}>{invite.invitedEmail}</span>
-              <span className={styles.meta}>
-                {invite.isExpired ? 'Süresi doldu' : `${formatRelativeTime(invite.createdAt)} gönderildi`}
-              </span>
+              <span className={styles.meta}>{buildInviteMeta(invite)}</span>
             </div>
+
+            <span className={`${styles.statusBadge} ${styles[`status${invite.emailStatus}`]}`}>
+              {EMAIL_STATUS_LABELS[invite.emailStatus]}
+            </span>
 
             <span className={`${styles.roleBadge} ${styles[`role${invite.role}`]}`}>
               {ROLE_LABELS[invite.role]}
@@ -68,6 +92,7 @@ const PendingInviteList = ({ listId }: Props) => {
           </div>
         ))}
       </div>
+      {resendErrorMessage && <p className={styles.errorText}>{resendErrorMessage}</p>}
     </div>
   )
 }

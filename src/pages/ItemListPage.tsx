@@ -3,11 +3,10 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useItems } from '@/features/items/hooks/useItems'
 import { useCategories } from '@/features/categories/hooks/useCategories'
 import { useListDetail } from '@/features/lists/hooks/useListDetail'
-import { useListStore } from '@/store/listStore'
-import { useSignalR } from '@/hooks/useSignalR'
 import { usePermission } from '@/hooks/usePermission'
 import { Breadcrumb } from '@/components/layout/Breadcrumb'
 import AddCategoryModal from '@/features/categories/components/AddCategoryModal'
+import { formatPrice } from '@/lib/formatters'
 import { ROUTES } from '@/router/routes'
 import type { ItemDto } from '@/features/items/types'
 import styles from './ItemListPage.module.css'
@@ -43,7 +42,6 @@ const OptionsIcon = () => (
 const ItemListPage = () => {
   const { listId } = useParams<{ listId: string }>()
   const navigate = useNavigate()
-  const setActiveListId = useListStore((s) => s.setActiveListId)
 
   const [searchParams] = useSearchParams()
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
@@ -51,14 +49,10 @@ const ItemListPage = () => {
   )
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false)
 
-  if (listId) setActiveListId(listId)
-
   const { data: listDetail } = useListDetail(listId ?? '')
   const { data: items, isLoading } = useItems(listId ?? '', 'All')
   const { data: categories } = useCategories(listId ?? '')
   const { canEdit } = usePermission(listId ?? '')
-
-  useSignalR()
 
   const filteredItems = useMemo(() => {
     if (!items) return []
@@ -156,15 +150,19 @@ const ItemListPage = () => {
                 <div
                   key={item.id}
                   className={styles.card}
-                  onClick={() => navigate(ROUTES.ITEM_DETAIL_WITH_ID(listId, item.id), { state: { item } })}
+                  onClick={() => navigate(ROUTES.ITEM_DETAIL_WITH_ID(listId, item.id))}
                   role="button"
                   tabIndex={0}
-                  onKeyDown={(e) => e.key === 'Enter' && navigate(ROUTES.ITEM_DETAIL_WITH_ID(listId, item.id), { state: { item } })}
+                  onKeyDown={(e) => e.key === 'Enter' && navigate(ROUTES.ITEM_DETAIL_WITH_ID(listId, item.id))}
                 >
                   <div className={styles.cardImage}>
-                    <span className={styles.cardImagePlaceholder}>
-                      {getCategoryIcon(item.categoryName)}
-                    </span>
+                    {item.imageUrl ? (
+                      <img src={item.imageUrl} alt={item.name} loading="lazy" />
+                    ) : (
+                      <span className={styles.cardImagePlaceholder}>
+                        {getCategoryIcon(item.categoryName)}
+                      </span>
+                    )}
                     <div className={styles.cardIconBadge}>
                       {getCategoryIcon(item.categoryName)}
                     </div>
@@ -184,7 +182,7 @@ const ItemListPage = () => {
                         <OptionsIcon />
                         {item.optionsCount} Seçenek
                       </span>
-                      <span className={styles.cardPrice}>—</span>
+                      <span className={styles.cardPrice}>{formatPrice(item.effectivePrice)}</span>
                     </div>
                   </div>
                 </div>

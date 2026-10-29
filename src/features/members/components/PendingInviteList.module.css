@@ -110,11 +110,48 @@
 
 .cancelBtn:hover:not(:disabled) {
   color: var(--color-danger);
-  background: #fef2f2;
+  background: var(--color-danger-bg);
 }
 
 .resendBtn:disabled,
 .cancelBtn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+.statusBadge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.statusPending {
+  background: var(--color-status-pending-bg);
+  color: var(--color-status-pending);
+}
+
+.statusSent {
+  background: var(--color-badge-editor-bg);
+  color: var(--color-badge-editor-text);
+}
+
+.statusDelivered {
+  background: var(--color-status-purchased-bg);
+  color: var(--color-status-purchased);
+}
+
+.statusFailed,
+.statusBounced,
+.statusComplained {
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+  color: var(--color-danger);
+}
+
+.errorText {
+  margin-top: var(--space-2);
+  font-size: 13px;
+  color: var(--color-danger);
 }

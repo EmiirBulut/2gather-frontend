@@ -4,20 +4,22 @@ import { connect, disconnect, joinList, leaveList, onEvent } from '@/services/si
 import { useAuthStore } from '@/store/authStore'
 import { useListStore } from '@/store/listStore'
 import { QUERY_KEYS } from '@/lib/queryKeys'
-import type { ItemDto } from '@/features/items/types'
+import { invalidateListAggregates as invalidateListAggregatesFor } from '@/lib/listCache'
+import type { BackendItemDto, ItemDto } from '@/features/items/types'
 import type { ItemOptionDto } from '@/features/options/types'
 import type { MemberDto } from '@/features/members/types'
 
 // ─── SignalR event payload shapes ────────────────────────────────────────────
 
+// Raw backend ItemDto; only the id is read (lists are refetched to get the adapted shape)
 interface ItemAddedPayload {
   listId: string
-  item: ItemDto
+  item: Pick<BackendItemDto, 'id'>
 }
 
 interface ItemUpdatedPayload {
   listId: string
-  item: ItemDto
+  item: Pick<BackendItemDto, 'id'>
 }
 
 interface ItemPurchasedPayload {
@@ -26,22 +28,51 @@ interface ItemPurchasedPayload {
   purchasedAt: string
 }
 
+interface ItemImageUpdatedPayload {
+  listId: string
+  itemId: string
+  imageUrl: string
+}
+
+interface CategoryDeletedPayload {
+  listId: string
+  categoryId: string
+}
+
+interface ListUpdatedPayload {
+  listId: string
+  name: string
+}
+
+interface InviteStatusChangedPayload {
+  listId: string
+  inviteId: string
+}
+
+interface ItemPurchaseUndonePayload {
+  listId: string
+  itemId: string
+}
+
 interface ItemDeletedPayload {
   listId: string
   itemId: string
 }
 
 interface OptionAddedPayload {
+  listId: string
   itemId: string
   option: ItemOptionDto
 }
 
 interface OptionUpdatedPayload {
+  listId: string
   itemId: string
   option: ItemOptionDto
 }
 
 interface OptionDeletedPayload {
+  listId: string
   itemId: string
   optionId: string
 }
@@ -62,10 +93,12 @@ interface OptionRatingUpdatedPayload {
 }
 
 interface OptionFinalizedPayload {
+  listId: string
   itemId: string
 }
 
 interface OptionFinalRemovedPayload {
+  listId: string
   itemId: string
 }
 
@@ -97,7 +130,16 @@ export function useSignalR(): void {
       // Connection failure is non-fatal — will retry via auto-reconnect
     })
 
+    // Auto-reconnect only retries a few times; reconnect when the device is back online
+    const handleOnline = () => {
+      connect().catch(() => {
+        // Still unreachable — the next online event or page visit retries
+      })
+    }
+    window.addEventListener('online', handleOnline)
+
     return () => {
+      window.removeEventListener('online', handleOnline)
       disconnect()
     }
   }, [accessToken])
@@ -126,32 +168,29 @@ export function useSignalR(): void {
 
     const offs: Array<() => void> = []
 
+    const invalidateListAggregates = (listId: string) => invalidateListAggregatesFor(queryClient, listId)
+
     // ── Items ──────────────────────────────────────────────────────────────
 
     offs.push(
-      onEvent<ItemAddedPayload>('ItemAdded', ({ listId, item }) => {
-        for (const status of ['Pending', 'All'] as const) {
-          queryClient.setQueryData<ItemDto[]>(
-            QUERY_KEYS.ITEMS(listId, status),
-            (old) => (old ? [...old, item] : [item])
-          )
-        }
+      // The payload is the backend's raw ItemDto (numeric status, no categoryName),
+      // so refetch the adapted lists instead of inserting it into the cache
+      onEvent<ItemAddedPayload>('ItemAdded', ({ listId }) => {
+        invalidateListAggregates(listId)
       })
     )
 
     offs.push(
       onEvent<ItemUpdatedPayload>('ItemUpdated', ({ listId, item }) => {
-        for (const status of ['Pending', 'Purchased', 'All'] as const) {
-          queryClient.setQueryData<ItemDto[]>(
-            QUERY_KEYS.ITEMS(listId, status),
-            (old) => old?.map((i) => (i.id === item.id ? item : i))
-          )
-        }
+        invalidateListAggregates(listId)
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEM_DETAIL(item.id) })
       })
     )
 
     offs.push(
       onEvent<ItemPurchasedPayload>('ItemPurchased', ({ listId, itemId, purchasedAt }) => {
+        invalidateListAggregates(listId)
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEM_DETAIL(itemId) })
         // Remove from Pending, update in Purchased + All
         queryClient.setQueryData<ItemDto[]>(
           QUERY_KEYS.ITEMS(listId, 'Pending'),
@@ -177,7 +216,16 @@ export function useSignalR(): void {
     )
 
     offs.push(
+      onEvent<ItemPurchaseUndonePayload>('ItemPurchaseUndone', ({ listId, itemId }) => {
+        invalidateListAggregates(listId)
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEM_DETAIL(itemId) })
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.OPTIONS(itemId) })
+      })
+    )
+
+    offs.push(
       onEvent<ItemDeletedPayload>('ItemDeleted', ({ listId, itemId }) => {
+        invalidateListAggregates(listId)
         for (const status of ['Pending', 'Purchased', 'All'] as const) {
           queryClient.setQueryData<ItemDto[]>(
             QUERY_KEYS.ITEMS(listId, status),
@@ -187,10 +235,19 @@ export function useSignalR(): void {
       })
     )
 
+    offs.push(
+      onEvent<ItemImageUpdatedPayload>('ItemImageUpdated', ({ listId, itemId }) => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEM_DETAIL(itemId) })
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEMS_BY_LIST(listId) })
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REPORTS(listId) })
+      })
+    )
+
     // ── Options ────────────────────────────────────────────────────────────
 
     offs.push(
-      onEvent<OptionAddedPayload>('OptionAdded', ({ itemId, option }) => {
+      onEvent<OptionAddedPayload>('OptionAdded', ({ listId, itemId, option }) => {
+        invalidateListAggregates(listId)
         queryClient.setQueryData<ItemOptionDto[]>(
           QUERY_KEYS.OPTIONS(itemId),
           (old) => (old ? [...old, option] : [option])
@@ -199,16 +256,17 @@ export function useSignalR(): void {
     )
 
     offs.push(
-      onEvent<OptionUpdatedPayload>('OptionUpdated', ({ itemId, option }) => {
-        queryClient.setQueryData<ItemOptionDto[]>(
-          QUERY_KEYS.OPTIONS(itemId),
-          (old) => old?.map((o) => (o.id === option.id ? option : o))
-        )
+      onEvent<OptionUpdatedPayload>('OptionUpdated', ({ listId, itemId }) => {
+        invalidateListAggregates(listId)
+        // Refetch instead of patching: selecting one option also unselects the others,
+        // and the event payload does not carry ratings or claims
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.OPTIONS(itemId) })
       })
     )
 
     offs.push(
-      onEvent<OptionDeletedPayload>('OptionDeleted', ({ itemId, optionId }) => {
+      onEvent<OptionDeletedPayload>('OptionDeleted', ({ listId, itemId, optionId }) => {
+        invalidateListAggregates(listId)
         queryClient.setQueryData<ItemOptionDto[]>(
           QUERY_KEYS.OPTIONS(itemId),
           (old) => old?.filter((o) => o.id !== optionId)
@@ -227,13 +285,15 @@ export function useSignalR(): void {
     // ── Final decision ────────────────────────────────────────────────────
 
     offs.push(
-      onEvent<OptionFinalizedPayload>('OptionFinalized', ({ itemId }) => {
+      onEvent<OptionFinalizedPayload>('OptionFinalized', ({ listId, itemId }) => {
+        invalidateListAggregates(listId)
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.OPTIONS(itemId) })
       })
     )
 
     offs.push(
-      onEvent<OptionFinalRemovedPayload>('OptionFinalRemoved', ({ itemId }) => {
+      onEvent<OptionFinalRemovedPayload>('OptionFinalRemoved', ({ listId, itemId }) => {
+        invalidateListAggregates(listId)
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.OPTIONS(itemId) })
       })
     )
@@ -254,7 +314,29 @@ export function useSignalR(): void {
       })
     )
 
+    // ── List ───────────────────────────────────────────────────────────────
+
+    offs.push(
+      onEvent<ListUpdatedPayload>('ListUpdated', ({ listId }) => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LIST_DETAIL(listId) })
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LISTS, exact: true })
+      })
+    )
+
+    offs.push(
+      onEvent<CategoryDeletedPayload>('CategoryDeleted', ({ listId }) => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CATEGORIES(listId) })
+        invalidateListAggregates(listId)
+      })
+    )
+
     // ── Members ────────────────────────────────────────────────────────────
+
+    offs.push(
+      onEvent<InviteStatusChangedPayload>('InviteStatusChanged', ({ listId }) => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PENDING_INVITES(listId) })
+      })
+    )
 
     offs.push(
       onEvent<MemberJoinedPayload>('MemberJoined', ({ listId, member }) => {

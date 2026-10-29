@@ -25,4 +25,8 @@ export const ROUTES = {
 
   MEMBERS: '/lists/:listId/members',
   MEMBERS_WITH_ID: (listId: string) => `/lists/${listId}/members`,
+
+  SETTINGS: '/settings',
+  LIST_SETTINGS: '/lists/:listId/settings',
+  LIST_SETTINGS_WITH_ID: (listId: string) => `/lists/${listId}/settings`,
 } as const

@@ -71,3 +71,8 @@ export interface CreateListRequest {
   name: string
   template: ListTemplate
 }
+
+// PATCH /api/lists/:id
+export interface RenameListRequest {
+  name: string
+}

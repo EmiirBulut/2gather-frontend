@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useInvalidateListData } from '@/hooks/useInvalidateListData'
 import { updateOption } from '../api/optionsApi'
 import { QUERY_KEYS } from '@/lib/queryKeys'
 import { normalizeError, type ApiError } from '@/services/api'
@@ -11,10 +12,12 @@ interface Variables {
 
 export function useUpdateOption(itemId: string) {
   const queryClient = useQueryClient()
+  const invalidateListData = useInvalidateListData()
 
   return useMutation<ItemOptionDto, ApiError, Variables>({
     mutationFn: ({ id, data }) => updateOption(id, data),
     onSuccess: () => {
+      invalidateListData()
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.OPTIONS(itemId) })
     },
     onError: (error: unknown) => normalizeError(error),

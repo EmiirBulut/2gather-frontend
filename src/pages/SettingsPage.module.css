@@ -1,0 +1,36 @@
+/* Forms read best in a narrow column, so the page is centered in the content area
+   (both in AppLayout and in TopNavLayout) instead of stretching full width */
+.page {
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: var(--space-6);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.stateText {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.errorText {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-danger);
+}

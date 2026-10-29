@@ -3,19 +3,17 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useItems } from '@/features/items/hooks/useItems'
 import { useListDetail } from '@/features/lists/hooks/useListDetail'
 import { useCategories } from '@/features/categories/hooks/useCategories'
-import { useListStore } from '@/store/listStore'
-import { useSignalR } from '@/hooks/useSignalR'
 import { ROUTES } from '@/router/routes'
 import { formatPrice } from '@/lib/formatters'
 import styles from './ListDetailPage.module.css'
 
 const CATEGORY_ICONS: Record<string, { icon: string; bg: string }> = {
-  salon: { icon: '🛋️', bg: '#E8F0EA' },
-  'yatak odası': { icon: '🛏️', bg: '#E8EDF5' },
-  mutfak: { icon: '🍳', bg: '#F5E8E8' },
-  banyo: { icon: '🚿', bg: '#E8F5F0' },
-  'çocuk odası': { icon: '🧸', bg: '#F5F0E8' },
-  default: { icon: '📦', bg: '#F0F0EE' },
+  salon: { icon: '🛋️', bg: 'var(--color-category-green)' },
+  'yatak odası': { icon: '🛏️', bg: 'var(--color-category-blue)' },
+  mutfak: { icon: '🍳', bg: 'var(--color-category-red)' },
+  banyo: { icon: '🚿', bg: 'var(--color-category-teal)' },
+  'çocuk odası': { icon: '🧸', bg: 'var(--color-category-sand)' },
+  default: { icon: '📦', bg: 'var(--color-category-neutral)' },
 }
 
 const getCategoryStyle = (name: string) =>
@@ -38,14 +36,10 @@ const FinancialIcon = () => (
 const ListDetailPage = () => {
   const { listId } = useParams<{ listId: string }>()
   const navigate = useNavigate()
-  const setActiveListId = useListStore((s) => s.setActiveListId)
-  if (listId) setActiveListId(listId)
 
   const { data: listDetail } = useListDetail(listId ?? '')
   const { data: allItems, isLoading: itemsLoading } = useItems(listId ?? '', 'All')
   const { data: categories, isLoading: catsLoading } = useCategories(listId ?? '')
-
-  useSignalR()
 
   const totalCount = allItems?.length ?? 0
   const purchasedCount = allItems?.filter((i) => i.status === 'Purchased').length ?? 0

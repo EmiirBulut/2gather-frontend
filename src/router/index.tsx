@@ -5,6 +5,7 @@ import ProtectedRoute from './ProtectedRoute'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { TopNavLayout } from '@/components/layout/TopNavLayout'
 import { AuthLayout } from '@/components/layout/AuthLayout'
+import RouteErrorPage from '@/pages/RouteErrorPage'
 
 // ─── Lazy Page Imports ────────────────────────────────────────────────────────
 
@@ -18,6 +19,7 @@ const ItemDetailPage = lazy(() => import('@/pages/ItemDetailPage'))
 const ReportsPage = lazy(() => import('@/pages/ReportsPage'))
 const MembersPage = lazy(() => import('@/pages/MembersPage'))
 const NewItemPage = lazy(() => import('@/pages/NewItemPage'))
+const SettingsPage = lazy(() => import('@/pages/SettingsPage'))
 
 // ─── Suspense Fallback ────────────────────────────────────────────────────────
 
@@ -48,6 +50,7 @@ export const router = createBrowserRouter([
   // Auth layout routes
   {
     element: <AuthLayout />,
+    errorElement: <RouteErrorPage />,
     children: [
       { path: ROUTES.LOGIN, element: withSuspense(<LoginPage />) },
       { path: ROUTES.REGISTER, element: withSuspense(<RegisterPage />) },
@@ -58,11 +61,13 @@ export const router = createBrowserRouter([
   // Protected — TopNavLayout (list selector)
   {
     element: <ProtectedRoute />,
+    errorElement: <RouteErrorPage />,
     children: [
       {
         element: <TopNavLayout />,
         children: [
           { path: ROUTES.LISTS, element: withSuspense(<ListSelectorPage />) },
+          { path: ROUTES.SETTINGS, element: withSuspense(<SettingsPage />) },
         ],
       },
       {
@@ -74,6 +79,7 @@ export const router = createBrowserRouter([
           { path: ROUTES.ITEM_DETAIL, element: withSuspense(<ItemDetailPage />) },
           { path: ROUTES.REPORTS, element: withSuspense(<ReportsPage />) },
           { path: ROUTES.MEMBERS, element: withSuspense(<MembersPage />) },
+          { path: ROUTES.LIST_SETTINGS, element: withSuspense(<SettingsPage />) },
         ],
       },
     ],

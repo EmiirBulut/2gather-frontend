@@ -6,6 +6,7 @@ import {
   cancelInvite,
   resendInvite,
 } from '../api/membersApi'
+import type { ApiError } from '@/services/api'
 import type { InviteMemberRequest } from '../types'
 
 export function usePendingInvites(listId: string) {
@@ -18,8 +19,8 @@ export function usePendingInvites(listId: string) {
 
 export function useInviteMember(listId: string) {
   const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: (data: InviteMemberRequest) => inviteMember(listId, data),
+  return useMutation<void, ApiError, InviteMemberRequest>({
+    mutationFn: (data) => inviteMember(listId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PENDING_INVITES(listId) })
     },
@@ -37,7 +38,12 @@ export function useCancelInvite(listId: string) {
 }
 
 export function useResendInvite(listId: string) {
-  return useMutation({
-    mutationFn: (inviteId: string) => resendInvite(listId, inviteId),
+  const queryClient = useQueryClient()
+  return useMutation<void, ApiError, string>({
+    mutationFn: (inviteId) => resendInvite(listId, inviteId),
+    // Status, send count and expiry change whether or not the email went out
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PENDING_INVITES(listId) })
+    },
   })
 }

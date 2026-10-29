@@ -7,6 +7,8 @@ import type { ItemDto } from '../types'
 interface Variables {
   itemId: string
   listId: string
+  purchaserUserIds: string[]
+  purchasedOptionId?: string
 }
 
 const FORBIDDEN_MESSAGE =
@@ -16,7 +18,8 @@ export function useMarkPurchased() {
   const queryClient = useQueryClient()
 
   return useMutation<void, ApiError, Variables>({
-    mutationFn: ({ itemId }) => markPurchased(itemId),
+    mutationFn: ({ itemId, purchaserUserIds, purchasedOptionId }) =>
+      markPurchased(itemId, { purchaserUserIds, purchasedOptionId }),
 
     // Optimistic update: remove from Pending immediately
     onMutate: async ({ itemId, listId }) => {
@@ -46,7 +49,10 @@ export function useMarkPurchased() {
       }
     },
 
-    onSettled: (_data, _err, { listId }) => {
+    onSettled: (_data, _err, { itemId, listId }) => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEM_DETAIL(itemId) })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.LIST_DETAIL(listId) })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.REPORTS(listId) })
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEMS(listId, 'Pending') })
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEMS(listId, 'Purchased') })
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ITEMS(listId, 'All') })

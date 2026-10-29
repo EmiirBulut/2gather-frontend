@@ -88,7 +88,7 @@
 
 .roleBtnActive {
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-on-primary);
   border-color: var(--color-primary);
 }
 
@@ -107,7 +107,7 @@
   width: 100%;
   padding: 12px;
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-on-primary);
   border: none;
   border-radius: var(--radius-md);
   font-family: var(--font-body);
@@ -136,14 +136,14 @@
 .serverError {
   font-size: 13px;
   color: var(--color-danger);
-  background: #fef2f2;
+  background: var(--color-danger-bg);
   padding: 10px 14px;
   border-radius: var(--radius-sm);
   margin-bottom: 12px;
 }
 
 .infoCard {
-  background: #FFF0EE;
+  background: var(--color-bg-highlight);
   border-radius: var(--radius-lg);
   padding: 16px;
   margin-top: 16px;

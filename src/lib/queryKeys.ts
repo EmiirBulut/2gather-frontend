@@ -7,10 +7,16 @@ export const QUERY_KEYS = {
   LIST_DETAIL: (id: string) => ['lists', id] as const,
 
   // Items
+  // Prefix of every ITEMS(listId, status) key
+  ITEMS_BY_LIST: (listId: string) => ['items', listId] as const,
   ITEMS: (listId: string, status: string) => ['items', listId, status] as const,
+  ITEM_DETAIL: (itemId: string) => ['item', itemId] as const,
 
   // Options
   OPTIONS: (itemId: string) => ['options', itemId] as const,
+
+  // Current user
+  CURRENT_USER: ['users', 'me'] as const,
 
   // Members
   MEMBERS: (listId: string) => ['members', listId] as const,
@@ -19,8 +25,11 @@ export const QUERY_KEYS = {
   CATEGORIES: (listId: string) => ['categories', listId] as const,
 
   // Reports
-  REPORTS_SUMMARY: (listId: string) => ['reports', 'summary', listId] as const,
-  REPORTS_CATEGORY: (listId: string) => ['reports', 'category', listId] as const,
+  // Scoped under listId so REPORTS(listId) invalidates every report of a list
+  REPORTS: (listId: string) => ['reports', listId] as const,
+  REPORTS_SUMMARY: (listId: string) => ['reports', listId, 'summary'] as const,
+  REPORTS_CATEGORY: (listId: string) => ['reports', listId, 'category'] as const,
+  REPORT_ITEMS: (listId: string) => ['reports', listId, 'items'] as const,
 
   // Ratings
   RATINGS: (optionId: string) => ['ratings', optionId] as const,

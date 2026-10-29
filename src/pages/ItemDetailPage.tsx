@@ -1,15 +1,21 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useOptions } from '@/features/options/hooks/useOptions'
 import { useCreateOption } from '@/features/options/hooks/useCreateOption'
-import { useMarkPurchased } from '@/features/items/hooks/useMarkPurchased'
+import { useItemDetail } from '@/features/items/hooks/useItemDetail'
+import { useUploadItemImage } from '@/features/items/hooks/useUploadItemImage'
+import { useUndoPurchase } from '@/features/items/hooks/useUndoPurchase'
+import { IMAGE_INPUT_ACCEPT, itemImageSchema } from '@/lib/images'
+import { getErrorMessage } from '@/services/api'
 import { usePermission } from '@/hooks/usePermission'
 import { useListDetail } from '@/features/lists/hooks/useListDetail'
 import { Breadcrumb } from '@/components/layout/Breadcrumb'
 import OptionCard from '@/features/options/components/OptionCard'
 import OptionForm from '@/features/options/components/OptionForm'
+import PurchaserSelectModal from '@/features/items/components/PurchaserSelectModal'
+import { useAuthStore } from '@/store/authStore'
+import { formatPrice } from '@/lib/formatters'
 import { ROUTES } from '@/router/routes'
-import type { ItemDto } from '@/features/items/types'
 import type { CreateOptionRequest } from '@/features/options/types'
 import styles from './ItemDetailPage.module.css'
 
@@ -25,25 +31,43 @@ const getCategoryIcon = (name: string) => CATEGORY_ICON[name.toLowerCase()] ?? '
 const ItemDetailPage = () => {
   const { listId, itemId } = useParams<{ listId: string; itemId: string }>()
   const navigate = useNavigate()
-  const location = useLocation()
-  const item = location.state?.item as ItemDto | undefined
 
   const [isAddingOption, setIsAddingOption] = useState(false)
+  const [isPurchaserModalOpen, setIsPurchaserModalOpen] = useState(false)
+  const currentUserId = useAuthStore((s) => s.user?.id)
+  const location = useLocation()
+  const isImageUploadFailed = (location.state as { isImageUploadFailed?: boolean } | null)?.isImageUploadFailed === true
+  const imageInputRef = useRef<HTMLInputElement>(null)
+  const [imageValidationError, setImageValidationError] = useState<string | null>(null)
 
   const { canEdit, isOwner } = usePermission(listId ?? '')
+  const { data: item, isLoading: isItemLoading, isError: isItemError } = useItemDetail(itemId ?? '')
+  const {
+    mutate: uploadImage,
+    isPending: isUploadingImage,
+    error: uploadError,
+    isSuccess: isUploadSuccess,
+  } = useUploadItemImage(listId ?? '')
+  const { mutate: undoPurchase, isPending: isUndoingPurchase, error: undoError } = useUndoPurchase()
   const { data: listDetail } = useListDetail(listId ?? '')
   const { data: options, isLoading: optionsLoading } = useOptions(itemId ?? '')
   const { mutate: handleAddOption, isPending: isAdding, error: addError } = useCreateOption(itemId ?? '')
-  const { mutate: handleMarkPurchased, isPending: isMarkingPurchased } = useMarkPurchased()
 
   if (!listId || !itemId) {
     navigate(ROUTES.LISTS)
     return null
   }
 
-  if (!item) {
-    navigate(ROUTES.ITEM_LIST_WITH_ID(listId))
-    return null
+  if (isItemLoading) {
+    return <div className={styles.page}><p className={styles.stateText}>Yükleniyor…</p></div>
+  }
+
+  if (isItemError || !item) {
+    return (
+      <div className={styles.page}>
+        <p className={styles.stateText}>Ürün bilgisi yüklenemedi.</p>
+      </div>
+    )
   }
 
   const handleAddOptionSubmit = (data: Omit<CreateOptionRequest, 'itemId'>) => {
@@ -53,15 +77,52 @@ const ItemDetailPage = () => {
     )
   }
 
-  const handleMarkPurchasedClick = () => {
-    handleMarkPurchased(
-      { itemId, listId },
-      { onSuccess: () => navigate(ROUTES.ITEM_LIST_WITH_ID(listId)) }
-    )
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    const result = itemImageSchema.safeParse(file)
+    if (!result.success) {
+      setImageValidationError(result.error.issues[0]?.message ?? null)
+      return
+    }
+    setImageValidationError(null)
+    uploadImage({ itemId, file: result.data })
+  }
+
+  const handleUndoPurchase = () => {
+    if (!confirm('Satın alma geri alınsın mı? Ürün tekrar "Bekliyor" durumuna döner.')) return
+    undoPurchase({ itemId, listId })
+  }
+
+  const handlePurchaseSuccess = () => {
+    setIsPurchaserModalOpen(false)
+    navigate(ROUTES.ITEM_LIST_WITH_ID(listId))
   }
 
   const listName = listDetail?.name ?? '—'
   const selectedOption = options?.find((o) => o.isSelected)
+
+  // Pre-select approved claimants of the final option; otherwise the current user
+  const approvedClaimantIds = options
+    ?.find((o) => o.isFinal)
+    ?.claims.filter((c) => c.status === 1)
+    .map((c) => c.userId) ?? []
+  const defaultPurchaserIds = approvedClaimantIds.length > 0
+    ? approvedClaimantIds
+    : currentUserId ? [currentUserId] : []
+  const purchaserNames = item.purchasers.map((p) => p.displayName).join(', ')
+  const purchasedOption = options?.find((o) => o.id === item.purchasedOptionId)
+  // Pre-fill the bought option: final decision, then the selected one, then the only option
+  const defaultPurchasedOptionId = (
+    options?.find((o) => o.isFinal) ?? selectedOption ?? (options?.length === 1 ? options[0] : undefined)
+  )?.id
+  // A purchased item is locked; only the owner can undo the purchase
+  const canEditItem = canEdit && item.status !== 'Purchased'
+  const undoErrorMessage = getErrorMessage(undoError, 'Satın alma geri alınamadı. Lütfen tekrar deneyin.')
+  const imageErrorMessage = imageValidationError
+    ?? getErrorMessage(uploadError, 'Görsel yüklenemedi. Lütfen tekrar deneyin.')
+    ?? (isImageUploadFailed && !isUploadSuccess ? 'Ürün oluşturuldu ancak görsel yüklenemedi. Buradan tekrar deneyebilirsiniz.' : null)
 
   return (
     <div className={styles.page}>
@@ -79,9 +140,32 @@ const ItemDetailPage = () => {
           <h1 className={styles.title}>{item.name}</h1>
 
           <div className={styles.imageWrapper}>
-            <span className={styles.imagePlaceholder}>
-              {getCategoryIcon(item.categoryName)}
-            </span>
+            {item.imageUrl ? (
+              <img src={item.imageUrl} alt={item.name} className={styles.image} />
+            ) : (
+              <span className={styles.imagePlaceholder}>
+                {getCategoryIcon(item.categoryName)}
+              </span>
+            )}
+            {canEditItem && (
+              <>
+                <button
+                  type="button"
+                  className={styles.changeImageBtn}
+                  onClick={() => imageInputRef.current?.click()}
+                  disabled={isUploadingImage}
+                >
+                  {isUploadingImage ? 'Yükleniyor…' : item.imageUrl ? 'Görseli Değiştir' : 'Görsel Ekle'}
+                </button>
+                <input
+                  ref={imageInputRef}
+                  type="file"
+                  accept={IMAGE_INPUT_ACCEPT}
+                  className={styles.hiddenInput}
+                  onChange={handleImageChange}
+                />
+              </>
+            )}
             <div className={styles.imageTags}>
               <span className={styles.imageTag}>{item.categoryName.toUpperCase()}</span>
               {item.status === 'Purchased' && (
@@ -89,6 +173,8 @@ const ItemDetailPage = () => {
               )}
             </div>
           </div>
+
+          {imageErrorMessage && <p className={styles.imageError}>{imageErrorMessage}</p>}
 
           <h2 className={styles.sectionTitle}>Seçenekler</h2>
 
@@ -133,7 +219,7 @@ const ItemDetailPage = () => {
               </div>
             </div>
 
-            {canEdit && (
+            {canEditItem && (
               <button
                 className={styles.addOptionBtn}
                 onClick={() => setIsAddingOption(true)}
@@ -208,10 +294,9 @@ const ItemDetailPage = () => {
             <div className={styles.panelCard}>
               <button
                 className={styles.markPurchasedBtn}
-                onClick={handleMarkPurchasedClick}
-                disabled={isMarkingPurchased}
+                onClick={() => setIsPurchaserModalOpen(true)}
               >
-                {isMarkingPurchased ? 'İşleniyor…' : '✓ Satın Alındı Olarak İşaretle'}
+                ✓ Satın Alındı Olarak İşaretle
               </button>
             </div>
           )}
@@ -224,10 +309,41 @@ const ItemDetailPage = () => {
                 </svg>
                 Satın Alındı
               </div>
+              {purchasedOption && (
+                <p className={styles.purchasedBy}>
+                  Alınan seçenek: {purchasedOption.title} · {formatPrice(purchasedOption.price)}
+                </p>
+              )}
+              {purchaserNames && (
+                <p className={styles.purchasedBy}>Satın alan: {purchaserNames}</p>
+              )}
+              {isOwner && (
+                <button
+                  type="button"
+                  className={styles.undoPurchaseBtn}
+                  onClick={handleUndoPurchase}
+                  disabled={isUndoingPurchase}
+                >
+                  {isUndoingPurchase ? 'Geri alınıyor…' : 'Satın almayı geri al'}
+                </button>
+              )}
+              {undoErrorMessage && <p className={styles.imageError}>{undoErrorMessage}</p>}
             </div>
           )}
         </div>
       </div>
+
+      {isPurchaserModalOpen && (
+        <PurchaserSelectModal
+          listId={listId}
+          itemId={itemId}
+          defaultPurchaserIds={defaultPurchaserIds}
+          options={options ?? []}
+          defaultPurchasedOptionId={defaultPurchasedOptionId}
+          onClose={() => setIsPurchaserModalOpen(false)}
+          onSuccess={handlePurchaseSuccess}
+        />
+      )}
     </div>
   )
 }

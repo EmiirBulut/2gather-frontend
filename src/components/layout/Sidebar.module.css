@@ -216,3 +216,19 @@
   font-size: 11px;
   color: var(--color-text-muted);
 }
+
+.installSlot {
+  padding: 0 12px var(--space-2);
+}
+
+.installSlot:empty {
+  display: none;
+}
+
+.offlineSlot {
+  margin-top: var(--space-2);
+}
+
+.offlineSlot:empty {
+  display: none;
+}
